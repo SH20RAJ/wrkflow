@@ -10,17 +10,18 @@ import { workflows, users } from "@/lib/db/schema";
 import { eq, like, or, and } from "drizzle-orm";
 
 interface SearchPageProps {
-    searchParams: {
+    searchParams: Promise<{
         q?: string;
         category?: string;
         tags?: string;
-    };
+    }>;
 }
 
 export default async function SearchPage({ searchParams }: SearchPageProps) {
-    const query = searchParams.q || '';
-    const category = searchParams.category || '';
-    const tags = searchParams.tags || '';
+    const { q, category, tags } = await searchParams;
+    const query = q || '';
+    const categoryFilter = category || '';
+    const tagsFilter = tags || '';
 
     // Build search conditions
     const whereConditions = [];
@@ -35,8 +36,8 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
         );
     }
     
-    if (category) {
-        whereConditions.push(eq(workflows.categoryId, category));
+    if (categoryFilter) {
+        whereConditions.push(eq(workflows.categoryId, categoryFilter));
     }
     
     // Only show public workflows in search
@@ -87,13 +88,13 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
                         </div>
                         <Input
                             name="category"
-                            defaultValue={category}
+                            defaultValue={categoryFilter}
                             placeholder="Category"
                             className="sm:w-48"
                         />
                         <Input
                             name="tags"
-                            defaultValue={tags}
+                            defaultValue={tagsFilter}
                             placeholder="Tags"
                             className="sm:w-48"
                         />

@@ -2,7 +2,6 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   reactStrictMode: true,
-  swcMinify: true,
   images: {
     formats: ['image/avif', 'image/webp'],
     remotePatterns: [
@@ -20,12 +19,6 @@ const nextConfig: NextConfig = {
       'date-fns',
       'recharts',
     ],
-  },
-  // Add metadata for the application
-  metadata: {
-    title: 'wrkflow - N8N Workflow Marketplace',
-    description: 'Share, discover, and monetize N8N automation workflows',
-    keywords: ['n8n', 'workflow', 'automation', 'marketplace', 'nocode'],
   },
 };
 
