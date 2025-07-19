@@ -23,7 +23,7 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
     const tags = searchParams.tags || '';
 
     // Build search conditions
-    let whereConditions = [];
+    const whereConditions = [];
     
     if (query) {
         whereConditions.push(

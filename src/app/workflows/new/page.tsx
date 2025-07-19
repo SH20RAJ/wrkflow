@@ -19,7 +19,7 @@ export default function NewWorkflowPage() {
     const [jsonUrl, setJsonUrl] = useState('');
     const [inputMethod, setInputMethod] = useState<'paste' | 'url'>('paste');
     const [jsonError, setJsonError] = useState('');
-    const [jsonPreview, setJsonPreview] = useState<any>(null);
+    const [jsonPreview, setJsonPreview] = useState<Record<string, unknown> | null>(null);
     const [tags, setTags] = useState<string[]>([]);
     const [newTag, setNewTag] = useState('');
 
@@ -29,7 +29,7 @@ export default function NewWorkflowPage() {
             setJsonError('');
             setJsonPreview(parsed);
             return true;
-        } catch (error) {
+        } catch {
             setJsonError('Invalid JSON format. Please check your workflow JSON.');
             setJsonPreview(null);
             return false;
