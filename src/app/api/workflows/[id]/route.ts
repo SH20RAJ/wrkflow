@@ -6,10 +6,10 @@ import { NextRequest, NextResponse } from "next/server";
  */
 export async function GET(
     request: NextRequest,
-    { params }: { params: { id: string } }
+    { params }: { params: Promise<{ id: string }> }
 ) {
     try {
-        const { id } = params;
+        const { id } = await params;
 
         // Mock response - will be replaced with actual database query
         const workflow = {
@@ -57,7 +57,7 @@ export async function GET(
 
         return NextResponse.json(workflow);
     } catch (error) {
-        console.error(`Error fetching workflow ${params.id}:`, error);
+        console.error(`Error fetching workflow ${id}:`, error);
         return NextResponse.json(
             { error: "Failed to fetch workflow" },
             { status: 500 }
@@ -71,10 +71,10 @@ export async function GET(
  */
 export async function PUT(
     request: NextRequest,
-    { params }: { params: { id: string } }
+    { params }: { params: Promise<{ id: string }> }
 ) {
     try {
-        const { id } = params;
+        const { id } = await params;
         const body = await request.json();
 
         // Validate request body
@@ -94,7 +94,7 @@ export async function PUT(
 
         return NextResponse.json(updatedWorkflow);
     } catch (error) {
-        console.error(`Error updating workflow ${params.id}:`, error);
+        console.error(`Error updating workflow ${id}:`, error);
         return NextResponse.json(
             { error: "Failed to update workflow" },
             { status: 500 }
@@ -108,15 +108,15 @@ export async function PUT(
  */
 export async function DELETE(
     request: NextRequest,
-    { params }: { params: { id: string } }
+    { params }: { params: Promise<{ id: string }> }
 ) {
     try {
-        const { id } = params;
+        const { id } = await params;
 
         // Mock response - will be replaced with actual database deletion
         return NextResponse.json({ success: true, deletedId: id });
     } catch (error) {
-        console.error(`Error deleting workflow ${params.id}:`, error);
+        console.error(`Error deleting workflow ${id}:`, error);
         return NextResponse.json(
             { error: "Failed to delete workflow" },
             { status: 500 }

@@ -22,8 +22,12 @@ export async function createWorkflow(formData: FormData) {
         const description = formData.get("description") as string;
         const coverImage = formData.get("coverImage") as string;
         const jsonContent = formData.get("jsonContent") as string;
+        const jsonUrl = formData.get("jsonUrl") as string;
         const isPaid = formData.get("isPaid") === "on";
+        const isPrivate = formData.get("isPrivate") === "on";
         const price = isPaid ? parseFloat(formData.get("price") as string) || 0 : null;
+        const categoryId = formData.get("categoryId") as string;
+        const tags = formData.get("tags") as string;
         const howItWorks = formData.get("howItWorks") as string;
         const stepByStep = formData.get("stepByStep") as string;
 
@@ -36,15 +40,17 @@ export async function createWorkflow(formData: FormData) {
             throw new Error("Description is required");
         }
 
-        if (!jsonContent?.trim()) {
-            throw new Error("Workflow JSON content is required");
+        if (!jsonContent?.trim() && !jsonUrl?.trim()) {
+            throw new Error("Either JSON content or JSON URL is required");
         }
 
-        // Validate JSON format
-        try {
-            JSON.parse(jsonContent);
-        } catch (error) {
-            throw new Error("Invalid JSON format. Please check your workflow JSON.");
+        // Validate JSON format if content is provided
+        if (jsonContent?.trim()) {
+            try {
+                JSON.parse(jsonContent);
+            } catch (error) {
+                throw new Error("Invalid JSON format. Please check your workflow JSON.");
+            }
         }
 
         const [newWorkflow] = await db
@@ -54,9 +60,13 @@ export async function createWorkflow(formData: FormData) {
                 description: description.trim(),
                 coverImage: coverImage?.trim() || null,
                 userId: user.id,
-                jsonContent: jsonContent.trim(),
+                jsonContent: jsonContent?.trim() || null,
+                jsonUrl: jsonUrl?.trim() || null,
                 isPaid,
+                isPrivate,
                 price,
+                categoryId: categoryId || null,
+                tags: tags || null,
                 howItWorks: howItWorks?.trim() || null,
                 stepByStep: stepByStep?.trim() || null,
             })

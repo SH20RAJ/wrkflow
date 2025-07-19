@@ -3,12 +3,13 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { ArrowLeft, Download, Eye, Star, Share, Calendar } from "lucide-react";
+import { ArrowLeft, Download, Eye, Star, Share, Calendar, Copy } from "lucide-react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { db } from "@/lib/db";
 import { workflows, users } from "@/lib/db/schema";
 import { eq } from "drizzle-orm";
+import ReactMarkdown from "react-markdown";
 
 interface WorkflowPageProps {
     params: {
@@ -17,6 +18,7 @@ interface WorkflowPageProps {
 }
 
 export default async function WorkflowPage({ params }: WorkflowPageProps) {
+    const { id } = await params;
     const workflow = await db
         .select({
             id: workflows.id,
@@ -38,7 +40,7 @@ export default async function WorkflowPage({ params }: WorkflowPageProps) {
         })
         .from(workflows)
         .leftJoin(users, eq(workflows.userId, users.id))
-        .where(eq(workflows.id, params.id))
+        .where(eq(workflows.id, id))
         .limit(1);
 
     if (!workflow.length) {
@@ -71,9 +73,9 @@ export default async function WorkflowPage({ params }: WorkflowPageProps) {
                         )}
                         <div>
                             <h1 className="text-3xl font-bold mb-2">{workflowData.title}</h1>
-                            <p className="text-lg text-muted-foreground mb-4">
-                                {workflowData.description}
-                            </p>
+                            <div className="text-lg text-muted-foreground mb-4 prose prose-lg max-w-none">
+                                <ReactMarkdown>{workflowData.description}</ReactMarkdown>
+                            </div>
                             <div className="flex items-center gap-4 text-sm text-muted-foreground">
                                 <span className="flex items-center gap-1">
                                     <Eye className="h-4 w-4" />
@@ -97,7 +99,7 @@ export default async function WorkflowPage({ params }: WorkflowPageProps) {
                                 </CardHeader>
                                 <CardContent>
                                     <div className="prose prose-sm max-w-none">
-                                        {workflowData.howItWorks}
+                                        <ReactMarkdown>{workflowData.howItWorks}</ReactMarkdown>
                                     </div>
                                 </CardContent>
                             </Card>
@@ -110,7 +112,7 @@ export default async function WorkflowPage({ params }: WorkflowPageProps) {
                                 </CardHeader>
                                 <CardContent>
                                     <div className="prose prose-sm max-w-none">
-                                        {workflowData.stepByStep}
+                                        <ReactMarkdown>{workflowData.stepByStep}</ReactMarkdown>
                                     </div>
                                 </CardContent>
                             </Card>

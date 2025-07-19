@@ -21,10 +21,22 @@ export function Navbar() {
                             Workflows
                         </Link>
                         <Link
+                            href="/search"
+                            className="flex items-center text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
+                        >
+                            Search
+                        </Link>
+                        <Link
                             href="/categories"
                             className="flex items-center text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
                         >
                             Categories
+                        </Link>
+                        <Link
+                            href="/profile"
+                            className="flex items-center text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
+                        >
+                            Profile
                         </Link>
                         <Link
                             href="/about"
