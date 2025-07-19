@@ -131,8 +131,17 @@ export default async function DashboardPage() {
                     ) : (
                         <div className="space-y-4">
                             {userWorkflows.slice(0, 5).map((workflow) => (
-                                <div key={workflow.id} className="flex items-center justify-between p-4 border rounded-lg">
-                                    <div>
+                                <div key={workflow.id} className="flex items-center gap-4 p-4 border rounded-lg">
+                                    {workflow.coverImage && (
+                                        <div className="w-16 h-16 rounded-lg overflow-hidden flex-shrink-0">
+                                            <img
+                                                src={workflow.coverImage}
+                                                alt={`${workflow.title} poster`}
+                                                className="w-full h-full object-cover"
+                                            />
+                                        </div>
+                                    )}
+                                    <div className="flex-1">
                                         <h3 className="font-medium">{workflow.title}</h3>
                                         <p className="text-sm text-muted-foreground">
                                             {workflow.description.substring(0, 100)}...

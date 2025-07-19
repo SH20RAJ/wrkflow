@@ -68,7 +68,16 @@ export default async function WorkflowsPage() {
                 ) : (
                     <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
                         {allWorkflows.map((workflow) => (
-                            <Card key={workflow.id} className="hover:shadow-lg transition-shadow">
+                            <Card key={workflow.id} className="hover:shadow-lg transition-shadow overflow-hidden">
+                                {workflow.coverImage && (
+                                    <div className="aspect-video w-full overflow-hidden">
+                                        <img
+                                            src={workflow.coverImage}
+                                            alt={`${workflow.title} poster`}
+                                            className="h-full w-full object-cover"
+                                        />
+                                    </div>
+                                )}
                                 <CardHeader>
                                     <div className="flex items-start justify-between">
                                         <div className="flex-1">

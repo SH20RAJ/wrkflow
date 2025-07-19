@@ -60,6 +60,15 @@ export default async function WorkflowPage({ params }: WorkflowPageProps) {
                 <div className="grid gap-8 lg:grid-cols-3">
                     {/* Main Content */}
                     <div className="lg:col-span-2 space-y-6">
+                        {workflowData.coverImage && (
+                            <div className="aspect-video w-full overflow-hidden rounded-lg border">
+                                <img
+                                    src={workflowData.coverImage}
+                                    alt={`${workflowData.title} poster`}
+                                    className="h-full w-full object-cover"
+                                />
+                            </div>
+                        )}
                         <div>
                             <h1 className="text-3xl font-bold mb-2">{workflowData.title}</h1>
                             <p className="text-lg text-muted-foreground mb-4">

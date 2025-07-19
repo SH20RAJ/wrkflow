@@ -58,6 +58,18 @@ export default async function NewWorkflowPage() {
                                     required
                                 />
                             </div>
+                            <div className="space-y-2">
+                                <Label htmlFor="coverImage">Poster Image URL</Label>
+                                <Input
+                                    id="coverImage"
+                                    name="coverImage"
+                                    type="url"
+                                    placeholder="https://example.com/image.jpg"
+                                />
+                                <p className="text-xs text-muted-foreground">
+                                    Optional: Add a poster/cover image URL for your workflow
+                                </p>
+                            </div>
                         </CardContent>
                     </Card>
 

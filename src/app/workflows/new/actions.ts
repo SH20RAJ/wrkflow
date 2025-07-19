@@ -20,6 +20,7 @@ export async function createWorkflow(formData: FormData) {
 
         const title = formData.get("title") as string;
         const description = formData.get("description") as string;
+        const coverImage = formData.get("coverImage") as string;
         const jsonContent = formData.get("jsonContent") as string;
         const isPaid = formData.get("isPaid") === "on";
         const price = isPaid ? parseFloat(formData.get("price") as string) || 0 : null;
@@ -51,6 +52,7 @@ export async function createWorkflow(formData: FormData) {
             .values({
                 title: title.trim(),
                 description: description.trim(),
+                coverImage: coverImage?.trim() || null,
                 userId: user.id,
                 jsonContent: jsonContent.trim(),
                 isPaid,
