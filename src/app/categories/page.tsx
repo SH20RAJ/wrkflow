@@ -16,7 +16,6 @@ export default async function CategoriesPage() {
             name: categories.name,
             description: categories.description,
             slug: categories.slug,
-            color: categories.color,
             icon: categories.icon,
             workflowCount: count(workflows.id),
         })
@@ -91,7 +90,7 @@ export default async function CategoriesPage() {
         },
     ];
 
-    const displayCategories = categoriesWithCounts.length > 0 ? categoriesWithCounts : defaultCategories;
+    const displayCategories = categoriesWithCounts.length > 0 ? categoriesWithCounts.map(cat => ({...cat, color: 'gray'})) : defaultCategories;
 
     const getIcon = (iconName: string) => {
         const icons = {
@@ -131,11 +130,11 @@ export default async function CategoriesPage() {
 
                 <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
                     {displayCategories.map((category) => {
-                        const IconComponent = getIcon(category.icon);
+                        const IconComponent = getIcon(category.icon || 'Layers');
                         return (
                             <Card 
                                 key={category.id} 
-                                className={`transition-all duration-200 hover:shadow-lg cursor-pointer ${getColorClasses(category.color)}`}
+                                className={`transition-all duration-200 hover:shadow-lg cursor-pointer ${getColorClasses(category.color || 'gray')}`}
                             >
                                 <CardHeader>
                                     <div className="flex items-center gap-3">

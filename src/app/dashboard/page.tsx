@@ -99,7 +99,7 @@ export default async function DashboardPage() {
                     </CardHeader>
                     <CardContent>
                         <div className="text-2xl font-bold">
-                            {workflowCount > 0 ? Math.round(((totalViews || 0) + (totalDownloads || 0)) / workflowCount) : 0}
+                            {workflowCount > 0 ? Math.round(((Number(totalViews) || 0) + (Number(totalDownloads) || 0)) / workflowCount) : 0}
                         </div>
                         <p className="text-xs text-muted-foreground">
                             Avg. interactions per workflow

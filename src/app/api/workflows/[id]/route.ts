@@ -57,7 +57,7 @@ export async function GET(
 
         return NextResponse.json(workflow);
     } catch (error) {
-        console.error(`Error fetching workflow ${id}:`, error);
+        console.error(`Error fetching workflow:`, error);
         return NextResponse.json(
             { error: "Failed to fetch workflow" },
             { status: 500 }
@@ -75,7 +75,7 @@ export async function PUT(
 ) {
     try {
         const { id } = await params;
-        const body = await request.json();
+        const body = await request.json() as Record<string, unknown>;
 
         // Validate request body
         if (!body.title && !body.description && !body.category) {
@@ -94,7 +94,7 @@ export async function PUT(
 
         return NextResponse.json(updatedWorkflow);
     } catch (error) {
-        console.error(`Error updating workflow ${id}:`, error);
+        console.error(`Error updating workflow:`, error);
         return NextResponse.json(
             { error: "Failed to update workflow" },
             { status: 500 }
@@ -116,7 +116,7 @@ export async function DELETE(
         // Mock response - will be replaced with actual database deletion
         return NextResponse.json({ success: true, deletedId: id });
     } catch (error) {
-        console.error(`Error deleting workflow ${id}:`, error);
+        console.error(`Error deleting workflow:`, error);
         return NextResponse.json(
             { error: "Failed to delete workflow" },
             { status: 500 }

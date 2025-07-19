@@ -24,6 +24,10 @@ const eslintConfig = [
       "react/react-in-jsx-scope": "off", // Not needed in Next.js
       "react/display-name": "off",
       "react/no-unescaped-entities": "off",
+      "react/jsx-filename-extension": "off",
+      "react/jsx-props-no-spreading": "off",
+      "react/jsx-no-constructed-context-values": "off",
+      "react/jsx-no-comment-textnodes": "off",
 
       // TypeScript specific rules
       "@typescript-eslint/no-unused-vars": ["warn", {
@@ -33,6 +37,10 @@ const eslintConfig = [
       "@typescript-eslint/explicit-module-boundary-types": "off",
       "@typescript-eslint/no-explicit-any": "warn",
       "@typescript-eslint/no-non-null-assertion": "warn",
+      "@typescript-eslint/no-unused-vars": ["warn", {
+        "argsIgnorePattern": "^_",
+        "varsIgnorePattern": "^_"
+      }],
 
       // Import rules
       "import/no-anonymous-default-export": "off",

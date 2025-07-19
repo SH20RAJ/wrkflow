@@ -12,9 +12,9 @@ import { eq } from "drizzle-orm";
 import ReactMarkdown from "react-markdown";
 
 interface WorkflowPageProps {
-    params: {
+    params: Promise<{
         id: string;
-    };
+    }>;
 }
 
 export default async function WorkflowPage({ params }: WorkflowPageProps) {
