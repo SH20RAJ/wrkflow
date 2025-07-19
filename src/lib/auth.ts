@@ -1,5 +1,6 @@
 import { stackServerApp } from "@/stack";
 import { redirect } from "next/navigation";
+import { syncUserToDatabase } from "./user-sync";
 
 /**
  * Get the current user on the server side
@@ -8,6 +9,10 @@ import { redirect } from "next/navigation";
 export async function getCurrentUser() {
     try {
         const user = await stackServerApp.getUser();
+        if (user) {
+            // Sync user to our database
+            await syncUserToDatabase(user);
+        }
         return user;
     } catch (error) {
         return null;

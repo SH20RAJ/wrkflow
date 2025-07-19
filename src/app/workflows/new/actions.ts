@@ -15,22 +15,8 @@ export async function createWorkflow(formData: FormData) {
             redirect("/handler/sign-in");
         }
 
-        // Ensure user exists in our database
-        const existingUser = await db
-            .select()
-            .from(users)
-            .where(eq(users.id, user.id))
-            .limit(1);
-
-        if (existingUser.length === 0) {
-            await db.insert(users).values({
-                id: user.id,
-                email: user.primaryEmail || user.id + "@example.com",
-                name: user.displayName || "User",
-                avatar: user.profileImageUrl || null,
-                bio: null,
-            });
-        }
+        // User should already be synced by getCurrentUser, but ensure it exists
+        // This is now handled in the auth.ts getCurrentUser function
 
         const title = formData.get("title") as string;
         const description = formData.get("description") as string;
@@ -80,8 +66,14 @@ export async function createWorkflow(formData: FormData) {
         redirect(`/workflows/${newWorkflow.id}`);
     } catch (error) {
         console.error("Error creating workflow:", error);
-        // In a real app, you'd want to handle this error properly
-        // For now, we'll redirect back with an error
+        
+        // Handle redirect errors (these are not actual errors)
+        if (error && typeof error === 'object' && 'digest' in error && 
+            typeof error.digest === 'string' && error.digest.includes('NEXT_REDIRECT')) {
+            throw error; // Re-throw redirect errors
+        }
+        
+        // Handle actual errors
         redirect("/workflows/new?error=" + encodeURIComponent((error as Error).message));
     }
 }

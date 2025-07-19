@@ -1,4 +1,4 @@
-import { requireAuth } from "@/lib/auth";
+import { requireAuth, getCurrentUser } from "@/lib/auth";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Plus, Eye, Download, TrendingUp } from "lucide-react";
@@ -9,6 +9,9 @@ import { eq, sum, count, desc } from "drizzle-orm";
 
 export default async function DashboardPage() {
     const user = await requireAuth();
+    
+    // This will trigger user sync to database
+    await getCurrentUser();
 
     // Get user's workflows and stats
     const userWorkflows = await db
