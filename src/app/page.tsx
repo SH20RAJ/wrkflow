@@ -7,20 +7,40 @@ export default function Home() {
   return (
     <MainLayout>
       <section className="space-y-6 pb-8 pt-6 md:pb-12 md:pt-10 lg:py-32">
-        <div className="container flex max-w-[64rem] flex-col items-center gap-4 text-center">
-          <h1 className="text-3xl font-bold sm:text-5xl md:text-6xl lg:text-7xl">
-            {APP_NAME}
+        <div className="container flex max-w-[64rem] flex-col items-center gap-4 text-center justify-center">
+          <div className="inline-flex items-center rounded-lg bg-muted px-3 py-1 text-sm font-medium">
+            🚀 N8N Workflow Marketplace
+          </div>
+          <h1 className="text-3xl font-bold tracking-tighter sm:text-5xl md:text-6xl lg:text-7xl">
+            Share & Monetize Your
+            <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+              {" "}N8N Workflows
+            </span>
           </h1>
           <p className="max-w-[42rem] leading-normal text-muted-foreground sm:text-xl sm:leading-8">
-            {APP_DESCRIPTION}
+            {APP_DESCRIPTION}. Join thousands of automation enthusiasts building the future of workflow automation.
           </p>
           <div className="flex flex-col gap-4 sm:flex-row">
-            <Button size="lg" asChild>
+            <Button size="lg" className="h-12 px-8" asChild>
               <Link href="/workflows">Browse Workflows</Link>
             </Button>
-            <Button variant="outline" size="lg" asChild>
-              <Link href="/auth/register">Create Account</Link>
+            <Button variant="outline" size="lg" className="h-12 px-8" asChild>
+              <Link href="/handler/sign-up">Start Creating</Link>
             </Button>
+          </div>
+          <div className="flex items-center gap-8 text-sm text-muted-foreground mt-8">
+            <div className="flex items-center gap-2">
+              <div className="h-2 w-2 bg-green-500 rounded-full"></div>
+              Free to browse
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="h-2 w-2 bg-blue-500 rounded-full"></div>
+              Easy monetization
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="h-2 w-2 bg-purple-500 rounded-full"></div>
+              Community driven
+            </div>
           </div>
         </div>
       </section>
@@ -107,7 +127,7 @@ export default function Home() {
             Create an account today and start sharing your N8N workflows with the world.
           </p>
           <Button size="lg" asChild className="mt-4">
-            <Link href="/auth/register">Sign Up Now</Link>
+            <Link href="/handler/sign-up">Sign Up Now</Link>
           </Button>
         </div>
       </section>

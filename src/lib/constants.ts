@@ -1,16 +1,16 @@
 // Application information
-export const APP_NAME = "n8n Workflow Marketplace";
-export const APP_DESCRIPTION = "Discover, share, and use n8n workflows created by the community";
+export const APP_NAME = "wrkflow";
+export const APP_DESCRIPTION = "Discover, share, and monetize N8N automation workflows with our powerful marketplace platform";
 
 // Site configuration
 export const SITE_CONFIG = {
     title: APP_NAME,
     description: APP_DESCRIPTION,
-    url: "https://wrkflow.io",
+    url: "https://wrkflow.skechflow.space",
     ogImage: "/og-image.png",
     links: {
-        twitter: "https://twitter.com/n8n_io",
-        github: "https://github.com/n8n-io/n8n"
+        twitter: "https://twitter.com/wrkflow_io",
+        github: "https://github.com/wrkflow/wrkflow"
     }
 };
 

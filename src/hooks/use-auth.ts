@@ -1,10 +1,10 @@
 "use client";
 
-import { useUser } from "@stackframe/stack";
-import { stackApp } from "@/lib/stack-client";
+import { useUser, useStackApp } from "@stackframe/stack";
 
 export function useAuth() {
     const user = useUser();
+    const stackApp = useStackApp();
 
     return {
         user,

@@ -1,8 +1,7 @@
 "use client";
 
-import { StackApp } from "@stackframe/stack";
+import { useStackApp } from "@stackframe/stack";
 
-export const stackApp = new StackApp({
-    projectId: process.env.NEXT_PUBLIC_STACK_PROJECT_ID!,
-    publishableClientKey: process.env.NEXT_PUBLIC_STACK_PUBLISHABLE_CLIENT_KEY!,
-});
+export function useStackAppClient() {
+    return useStackApp();
+}
