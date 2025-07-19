@@ -1,103 +1,116 @@
-import Image from "next/image";
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
+import { MainLayout } from "@/components/layout/main-layout";
+import { APP_NAME, APP_DESCRIPTION } from "@/lib/constants";
 
 export default function Home() {
   return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm/6 text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-[family-name:var(--font-geist-mono)] font-semibold">
-              src/app/page.tsx
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
-
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+    <MainLayout>
+      <section className="space-y-6 pb-8 pt-6 md:pb-12 md:pt-10 lg:py-32">
+        <div className="container flex max-w-[64rem] flex-col items-center gap-4 text-center">
+          <h1 className="text-3xl font-bold sm:text-5xl md:text-6xl lg:text-7xl">
+            {APP_NAME}
+          </h1>
+          <p className="max-w-[42rem] leading-normal text-muted-foreground sm:text-xl sm:leading-8">
+            {APP_DESCRIPTION}
+          </p>
+          <div className="flex flex-col gap-4 sm:flex-row">
+            <Button size="lg" asChild>
+              <Link href="/workflows">Browse Workflows</Link>
+            </Button>
+            <Button variant="outline" size="lg" asChild>
+              <Link href="/auth/register">Create Account</Link>
+            </Button>
+          </div>
         </div>
-      </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
-    </div>
+      </section>
+
+      <section className="container space-y-6 py-8 md:py-12 lg:py-24">
+        <div className="mx-auto flex max-w-[58rem] flex-col items-center space-y-4 text-center">
+          <h2 className="text-3xl font-bold sm:text-4xl md:text-5xl">
+            Features
+          </h2>
+          <p className="max-w-[85%] leading-normal text-muted-foreground sm:text-lg sm:leading-7">
+            Discover, share, and monetize your N8N workflows with our powerful marketplace platform.
+          </p>
+        </div>
+
+        <div className="mx-auto grid justify-center gap-4 sm:grid-cols-2 md:max-w-[64rem] md:grid-cols-3">
+          <div className="relative overflow-hidden rounded-lg border bg-background p-6">
+            <div className="space-y-2">
+              <h3 className="font-bold">Discover Workflows</h3>
+              <p className="text-sm text-muted-foreground">
+                Browse and search for workflows by category, technology, or keyword.
+              </p>
+            </div>
+          </div>
+
+          <div className="relative overflow-hidden rounded-lg border bg-background p-6">
+            <div className="space-y-2">
+              <h3 className="font-bold">Share Your Creations</h3>
+              <p className="text-sm text-muted-foreground">
+                Publish your N8N workflows with detailed documentation and previews.
+              </p>
+            </div>
+          </div>
+
+          <div className="relative overflow-hidden rounded-lg border bg-background p-6">
+            <div className="space-y-2">
+              <h3 className="font-bold">Monetize Your Work</h3>
+              <p className="text-sm text-muted-foreground">
+                Set prices for your workflows and connect payment providers.
+              </p>
+            </div>
+          </div>
+
+          <div className="relative overflow-hidden rounded-lg border bg-background p-6">
+            <div className="space-y-2">
+              <h3 className="font-bold">Track Performance</h3>
+              <p className="text-sm text-muted-foreground">
+                Get insights into views, downloads, and engagement with your workflows.
+              </p>
+            </div>
+          </div>
+
+          <div className="relative overflow-hidden rounded-lg border bg-background p-6">
+            <div className="space-y-2">
+              <h3 className="font-bold">Community Engagement</h3>
+              <p className="text-sm text-muted-foreground">
+                Comment, rate, and review workflows from other creators.
+              </p>
+            </div>
+          </div>
+
+          <div className="relative overflow-hidden rounded-lg border bg-background p-6">
+            <div className="space-y-2">
+              <h3 className="font-bold">Detailed Documentation</h3>
+              <p className="text-sm text-muted-foreground">
+                Create rich markdown documentation for your workflows.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div className="mx-auto text-center md:max-w-[58rem]">
+          <p className="leading-normal text-muted-foreground sm:text-lg sm:leading-7">
+            Join our growing community of N8N workflow creators and users.
+          </p>
+        </div>
+      </section>
+
+      <section className="container py-8 md:py-12 lg:py-24">
+        <div className="mx-auto flex max-w-[58rem] flex-col items-center justify-center gap-4 text-center">
+          <h2 className="text-3xl font-bold sm:text-4xl md:text-5xl">
+            Ready to get started?
+          </h2>
+          <p className="max-w-[85%] leading-normal text-muted-foreground sm:text-lg sm:leading-7">
+            Create an account today and start sharing your N8N workflows with the world.
+          </p>
+          <Button size="lg" asChild className="mt-4">
+            <Link href="/auth/register">Sign Up Now</Link>
+          </Button>
+        </div>
+      </section>
+    </MainLayout>
   );
 }

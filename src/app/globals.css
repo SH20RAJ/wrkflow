@@ -41,6 +41,27 @@
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
   --radius-xl: calc(var(--radius) + 4px);
+
+  /* Marketplace specific variables */
+  --color-success: var(--success);
+  --color-success-foreground: var(--success-foreground);
+  --color-warning: var(--warning);
+  --color-warning-foreground: var(--warning-foreground);
+  --color-info: var(--info);
+  --color-info-foreground: var(--info-foreground);
+  --color-category-ai: var(--category-ai);
+  --color-category-sales: var(--category-sales);
+  --color-category-it-ops: var(--category-it-ops);
+  --color-category-marketing: var(--category-marketing);
+  --color-category-document-ops: var(--category-document-ops);
+  --color-category-support: var(--category-support);
+  --color-category-other: var(--category-other);
+  --shadow-sm: var(--shadow-sm);
+  --shadow-md: var(--shadow-md);
+  --shadow-lg: var(--shadow-lg);
+  --transition-fast: var(--transition-fast);
+  --transition-normal: var(--transition-normal);
+  --transition-slow: var(--transition-slow);
 }
 
 :root {
@@ -76,6 +97,33 @@
   --sidebar-accent-foreground: oklch(0.205 0 0);
   --sidebar-border: oklch(0.922 0 0);
   --sidebar-ring: oklch(0.708 0 0);
+
+  /* Marketplace specific variables */
+  --success: oklch(0.45 0.16 142.5);
+  --success-foreground: oklch(0.985 0 0);
+  --warning: oklch(0.75 0.18 78.0);
+  --warning-foreground: oklch(0.145 0 0);
+  --info: oklch(0.6 0.18 230.0);
+  --info-foreground: oklch(0.985 0 0);
+
+  /* Category colors */
+  --category-ai: oklch(0.55 0.2 264.0);
+  --category-sales: oklch(0.6 0.18 200.0);
+  --category-it-ops: oklch(0.5 0.15 150.0);
+  --category-marketing: oklch(0.65 0.22 45.0);
+  --category-document-ops: oklch(0.55 0.15 90.0);
+  --category-support: oklch(0.6 0.18 320.0);
+  --category-other: oklch(0.5 0.1 0.0);
+
+  /* Shadows */
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+
+  /* Transitions */
+  --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-normal: 300ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-slow: 500ms cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .dark {
@@ -110,12 +158,35 @@
   --sidebar-accent-foreground: oklch(0.985 0 0);
   --sidebar-border: oklch(1 0 0 / 10%);
   --sidebar-ring: oklch(0.556 0 0);
+
+  /* Marketplace specific variables - dark mode */
+  --success: oklch(0.5 0.2 142.5);
+  --success-foreground: oklch(0.145 0 0);
+  --warning: oklch(0.7 0.2 78.0);
+  --warning-foreground: oklch(0.145 0 0);
+  --info: oklch(0.65 0.2 230.0);
+  --info-foreground: oklch(0.145 0 0);
+
+  /* Category colors - dark mode */
+  --category-ai: oklch(0.65 0.25 264.0);
+  --category-sales: oklch(0.7 0.22 200.0);
+  --category-it-ops: oklch(0.6 0.18 150.0);
+  --category-marketing: oklch(0.7 0.25 45.0);
+  --category-document-ops: oklch(0.65 0.2 90.0);
+  --category-support: oklch(0.7 0.22 320.0);
+  --category-other: oklch(0.6 0.15 0.0);
+
+  /* Shadows - dark mode */
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.4);
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.4), 0 2px 4px -2px rgb(0 0 0 / 0.4);
+  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.4), 0 4px 6px -4px rgb(0 0 0 / 0.4);
 }
 
 @layer base {
   * {
     @apply border-border outline-ring/50;
   }
+
   body {
     @apply bg-background text-foreground;
   }
