@@ -14,6 +14,10 @@ export const workflows = sqliteTable('workflows', {
     price: real('price'),
     paymentLinks: text('payment_links'), // JSON stored as text
     coverImage: text('cover_image'),
+    posterImage: text('poster_image'),
+    youtubeUrl: text('youtube_url'),
+    screenshots: text('screenshots'), // JSON array of screenshot URLs
+    demoImages: text('demo_images'), // JSON array of demo image URLs
     howItWorks: text('how_it_works'),
     stepByStep: text('step_by_step'),
     isPrivate: integer('is_private', { mode: 'boolean' }).notNull().default(false),

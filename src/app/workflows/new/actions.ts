@@ -21,6 +21,10 @@ export async function createWorkflow(formData: FormData) {
         const title = formData.get("title") as string;
         const description = formData.get("description") as string;
         const coverImage = formData.get("coverImage") as string;
+        const posterImage = formData.get("posterImage") as string;
+        const youtubeUrl = formData.get("youtubeUrl") as string;
+        const screenshots = formData.get("screenshots") as string;
+        const demoImages = formData.get("demoImages") as string;
         const jsonContent = formData.get("jsonContent") as string;
         const jsonUrl = formData.get("jsonUrl") as string;
         const isPaid = formData.get("isPaid") === "on";
@@ -59,6 +63,10 @@ export async function createWorkflow(formData: FormData) {
                 title: title.trim(),
                 description: description.trim(),
                 coverImage: coverImage?.trim() || null,
+                posterImage: posterImage?.trim() || null,
+                youtubeUrl: youtubeUrl?.trim() || null,
+                screenshots: screenshots?.trim() || null,
+                demoImages: demoImages?.trim() || null,
                 userId: user.id,
                 jsonContent: jsonContent?.trim() || null,
                 jsonUrl: jsonUrl?.trim() || null,
