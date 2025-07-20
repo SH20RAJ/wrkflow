@@ -7,7 +7,7 @@ export async function syncUserToDatabase(stackUser: any) {
 
     try {
         // Check if user already exists
-        const existingUser = await db
+        const existingUser = await db.instance
             .select()
             .from(users)
             .where(eq(users.id, stackUser.id))
@@ -15,7 +15,7 @@ export async function syncUserToDatabase(stackUser: any) {
 
         if (existingUser.length === 0) {
             // Create new user
-            await db.insert(users).values({
+            await db.instance.insert(users).values({
                 id: stackUser.id,
                 email: stackUser.primaryEmail || stackUser.id + "@example.com",
                 name: stackUser.displayName || "User",

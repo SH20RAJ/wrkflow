@@ -8,9 +8,14 @@ import { db } from "@/lib/db";
 import { categories, workflows } from "@/lib/db/schema";
 import { eq, count } from "drizzle-orm";
 
+import { sql } from "drizzle-orm";
+
+// Force dynamic rendering to ensure database access happens at request time
+export const dynamic = 'force-dynamic';
+
 export default async function CategoriesPage() {
     // Get categories with workflow counts
-    const categoriesWithCounts = await db
+    const categoriesWithCounts = await db.instance
         .select({
             id: categories.id,
             name: categories.name,

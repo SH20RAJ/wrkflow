@@ -57,7 +57,7 @@ export async function createWorkflow(formData: FormData) {
             }
         }
 
-        const [newWorkflow] = await db
+        const [newWorkflow] = await db.instance
             .insert(workflows)
             .values({
                 title: title.trim(),

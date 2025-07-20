@@ -11,19 +11,22 @@ import { db } from "@/lib/db";
 import { workflows, savedWorkflows, collections, users } from "@/lib/db/schema";
 import { eq, desc } from "drizzle-orm";
 
+// Force dynamic rendering to ensure database access happens at request time  
+export const dynamic = 'force-dynamic';
+
 export default async function ProfilePage() {
     const user = await requireAuth();
     await getCurrentUser();
 
     // Get user's workflows
-    const userWorkflows = await db
+    const userWorkflows = await db.instance
         .select()
         .from(workflows)
         .where(eq(workflows.userId, user.id))
         .orderBy(desc(workflows.createdAt));
 
     // Get user's saved workflows
-    const userSavedWorkflows = await db
+    const userSavedWorkflows = await db.instance
         .select({
             id: savedWorkflows.id,
             savedAt: savedWorkflows.savedAt,
@@ -45,7 +48,7 @@ export default async function ProfilePage() {
         .orderBy(desc(savedWorkflows.savedAt));
 
     // Get user's collections
-    const userCollections = await db
+    const userCollections = await db.instance
         .select()
         .from(collections)
         .where(eq(collections.userId, user.id))

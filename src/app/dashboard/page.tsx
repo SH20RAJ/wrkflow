@@ -5,7 +5,10 @@ import { Plus, Eye, Download, TrendingUp } from "lucide-react";
 import Link from "next/link";
 import { db } from "@/lib/db";
 import { workflows } from "@/lib/db/schema";
-import { eq, sum, count, desc } from "drizzle-orm";
+import { eq, desc, sum, count } from "drizzle-orm";
+
+// Force dynamic rendering to ensure database access happens at request time
+export const dynamic = 'force-dynamic';
 
 export default async function DashboardPage() {
     const user = await requireAuth();
@@ -14,13 +17,13 @@ export default async function DashboardPage() {
     await getCurrentUser();
 
     // Get user's workflows and stats
-    const userWorkflows = await db
+    const userWorkflows = await db.instance
         .select()
         .from(workflows)
         .where(eq(workflows.userId, user.id))
         .orderBy(desc(workflows.createdAt));
 
-    const stats = await db
+    const stats = await db.instance
         .select({
             totalViews: sum(workflows.viewCount),
             totalDownloads: sum(workflows.downloadCount),

@@ -9,6 +9,9 @@ import { db } from "@/lib/db";
 import { workflows, users } from "@/lib/db/schema";
 import { eq, like, or, and } from "drizzle-orm";
 
+// Force dynamic rendering to ensure database access happens at request time
+export const dynamic = 'force-dynamic';
+
 interface SearchPageProps {
     searchParams: Promise<{
         q?: string;
@@ -43,7 +46,7 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
     // Only show public workflows in search
     whereConditions.push(eq(workflows.isPrivate, false));
 
-    const searchResults = await db
+    const searchResults = await db.instance
         .select({
             id: workflows.id,
             title: workflows.title,

@@ -1,19 +1,13 @@
 import type { Config } from 'drizzle-kit';
-import * as dotenv from 'dotenv';
-
-// Load environment variables from .env file
-dotenv.config({ path: '.env.local' });
-
-if (!process.env.DATABASE_URL) {
-    throw new Error('DATABASE_URL environment variable is not set');
-}
 
 export default {
     schema: './src/lib/db/schema/*',
     out: './drizzle',
-    dialect: 'turso',
+    dialect: 'sqlite',
+    driver: 'd1-http',
     dbCredentials: {
-        url: process.env.DATABASE_URL!,
-        authToken: process.env.DATABASE_AUTH_TOKEN,
+        databaseId: '101bf744-d0ac-4832-b6b2-e56eabbebe31',
+        token: process.env.CLOUDFLARE_API_TOKEN || '',
+        accountId: process.env.CLOUDFLARE_ACCOUNT_ID || '',
     },
 } satisfies Config;

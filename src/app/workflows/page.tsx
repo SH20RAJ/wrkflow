@@ -24,6 +24,9 @@ import { workflows, users } from "@/lib/db/schema";
 import { eq } from "drizzle-orm";
 import type { Metadata } from "next";
 
+// Force dynamic rendering to ensure database access happens at request time
+export const dynamic = 'force-dynamic';
+
 export const metadata: Metadata = {
   title: "N8N Workflows Marketplace | Browse Automation Workflows",
   description: "Discover thousands of professional N8N workflows. Download, customize, and deploy automation solutions for your business. Free and premium workflows available.",
@@ -37,7 +40,7 @@ export const metadata: Metadata = {
 
 export default async function WorkflowsPage() {
     // Get all workflows with user info
-    const allWorkflows = await db
+    const allWorkflows = await db.instance
         .select({
             id: workflows.id,
             title: workflows.title,

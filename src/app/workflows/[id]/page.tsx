@@ -11,6 +11,9 @@ import { workflows, users } from "@/lib/db/schema";
 import { eq } from "drizzle-orm";
 import ReactMarkdown from "react-markdown";
 
+// Force dynamic rendering to ensure database access happens at request time
+export const dynamic = 'force-dynamic';
+
 interface WorkflowPageProps {
     params: Promise<{
         id: string;
@@ -19,7 +22,7 @@ interface WorkflowPageProps {
 
 export default async function WorkflowPage({ params }: WorkflowPageProps) {
     const { id } = await params;
-    const workflow = await db
+    const workflow = await db.instance
         .select({
             id: workflows.id,
             title: workflows.title,

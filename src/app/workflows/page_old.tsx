@@ -11,7 +11,7 @@ import { eq } from "drizzle-orm";
 
 export default async function WorkflowsPage() {
     // Get all workflows with user info
-    const allWorkflows = await db
+    const allWorkflows = await db.instance
         .select({
             id: workflows.id,
             title: workflows.title,
