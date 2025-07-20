@@ -21,8 +21,8 @@ export const SITE_CONFIG = {
         "integration platform"
     ],
     links: {
-        twitter: "https://twitter.com/wrkflow_io",
-        github: "https://github.com/wrkflow/wrkflow"
+        twitter: "https://twitter.com/sh20raj",
+        github: "https://github.com/sh20raj/wrkflow"
     }
 };
 

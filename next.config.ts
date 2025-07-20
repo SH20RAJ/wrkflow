@@ -20,8 +20,16 @@ const nextConfig: NextConfig = {
       'recharts',
     ],
   },
+  serverExternalPackages: ["@libsql/client"],
   typescript: {
     ignoreBuildErrors: true,
+  },
+  webpack: (config: any, { isServer }: any) => {
+    if (isServer) {
+      config.externals = config.externals || [];
+      config.externals.push('@libsql/client');
+    }
+    return config;
   },
 };
 
