@@ -24,7 +24,7 @@ export const metadata: Metadata = {
     template: `%s | ${SITE_CONFIG.title}`,
   },
   description: SITE_CONFIG.description,
-  keywords: ["n8n", "workflow", "automation", "marketplace", "nocode"],
+  keywords: SITE_CONFIG.keywords,
   authors: [
     {
       name: "wrkflow",
