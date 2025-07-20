@@ -4,10 +4,22 @@ export const APP_DESCRIPTION = "Discover, share, and monetize N8N automation wor
 
 // Site configuration
 export const SITE_CONFIG = {
-    title: APP_NAME,
-    description: APP_DESCRIPTION,
+    title: "Wrkflow - N8N Workflow Marketplace | Automation Made Easy",
+    description: "Discover, share, and monetize professional N8N workflows. Join thousands of automation experts building the future of business automation. Free and premium workflows available.",
     url: "https://wrkflow.skechflow.space",
     ogImage: "/og-image.png",
+    keywords: [
+        "n8n workflows",
+        "automation marketplace", 
+        "business automation",
+        "workflow templates",
+        "n8n integrations",
+        "automation tools",
+        "workflow automation",
+        "no-code automation",
+        "process automation",
+        "integration platform"
+    ],
     links: {
         twitter: "https://twitter.com/wrkflow_io",
         github: "https://github.com/wrkflow/wrkflow"
