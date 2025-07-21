@@ -26,6 +26,18 @@
 			"migrations_dir": "./drizzle"
 		}
 	],
+	"env": {
+		"development": {
+			"d1_databases": [
+				{
+					"binding": "DB",
+					"database_name": "wrkflow-dev",
+					"database_id": "3f5e54bf-b024-43ac-9061-cd14bb018101",
+					"migrations_dir": "./drizzle"
+				}
+			]
+		}
+	},
 	/**
 	 * Smart Placement
 	 * Docs: https://developers.cloudflare.com/workers/configuration/smart-placement/#smart-placement
