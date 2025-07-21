@@ -5,29 +5,8 @@
     {
       "idx": 0,
       "version": "6",
-      "when": 1752944742277,
-      "tag": "0000_chemical_prima",
-      "breakpoints": true
-    },
-    {
-      "idx": 1,
-      "version": "6",
-      "when": 1752947087759,
-      "tag": "0001_aspiring_mephistopheles",
-      "breakpoints": true
-    },
-    {
-      "idx": 2,
-      "version": "6",
-      "when": 1752948497860,
-      "tag": "0002_small_bloodstorm",
-      "breakpoints": true
-    },
-    {
-      "idx": 3,
-      "version": "6",
-      "when": 1753007876107,
-      "tag": "0003_clever_shiver_man",
+      "when": 1753020864560,
+      "tag": "0000_unknown_lizard",
       "breakpoints": true
     }
   ]

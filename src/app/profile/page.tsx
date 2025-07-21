@@ -5,9 +5,10 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Settings, Eye, Download, Star, Lock, Globe } from "lucide-react";
+import { Settings, Eye, Download, Lock, Globe } from "lucide-react";
 import Link from "next/link";
-import { db } from "@/lib/db";
+import { redirect } from "next/navigation";
+import { getDB } from "@/lib/db";
 import { workflows, savedWorkflows, collections, users } from "@/lib/db/schema";
 import { eq, desc } from "drizzle-orm";
 
@@ -15,18 +16,24 @@ import { eq, desc } from "drizzle-orm";
 export const dynamic = 'force-dynamic';
 
 export default async function ProfilePage() {
-    const user = await requireAuth();
-    await getCurrentUser();
+    await requireAuth();
+    const user = await getCurrentUser();
+    
+    if (!user) {
+        redirect("/auth/signin");
+    }
 
-    // Get user's workflows
-    const userWorkflows = await db.instance
+    const db = getDB();
+
+    // Fetch user's workflows
+    const userWorkflows = await db
         .select()
         .from(workflows)
         .where(eq(workflows.userId, user.id))
         .orderBy(desc(workflows.createdAt));
 
-    // Get user's saved workflows
-    const userSavedWorkflows = await db.instance
+        // Get user's saved workflows
+    const userSavedWorkflows = await db
         .select({
             id: savedWorkflows.id,
             savedAt: savedWorkflows.savedAt,
@@ -36,26 +43,33 @@ export default async function ProfilePage() {
             coverImage: workflows.coverImage,
             isPaid: workflows.isPaid,
             price: workflows.price,
-            viewCount: workflows.viewCount,
+            categoryId: workflows.categoryId,
+            tags: workflows.tags,
             downloadCount: workflows.downloadCount,
-            authorName: users.name,
-            authorEmail: users.email,
+            viewCount: workflows.viewCount,
+            updatedAt: workflows.updatedAt
         })
         .from(savedWorkflows)
         .leftJoin(workflows, eq(savedWorkflows.workflowId, workflows.id))
-        .leftJoin(users, eq(workflows.userId, users.id))
         .where(eq(savedWorkflows.userId, user.id))
         .orderBy(desc(savedWorkflows.savedAt));
 
     // Get user's collections
-    const userCollections = await db.instance
+    const userCollections = await db
+        .select()
+        .from(collections)
+        .where(eq(collections.userId, user.id))
+        .orderBy(desc(collections.updatedAt));
+
+    // Get user's collections
+    const userCollections = await db
         .select()
         .from(collections)
         .where(eq(collections.userId, user.id))
         .orderBy(desc(collections.createdAt));
 
-    const publicWorkflows = userWorkflows.filter(w => !w.isPrivate);
-    const privateWorkflows = userWorkflows.filter(w => w.isPrivate);
+    const publicWorkflows = userWorkflows.filter((w: any) => !w.isPrivate);
+    const privateWorkflows = userWorkflows.filter((w: any) => w.isPrivate);
 
     return (
         <MainLayout>
@@ -64,7 +78,7 @@ export default async function ProfilePage() {
                 <div className="mb-8">
                     <div className="flex items-center gap-6 mb-6">
                         <Avatar className="h-24 w-24">
-                            <AvatarImage src={user.profilePictureUrl || ''} />
+                            <AvatarImage src={user.avatar || ''} />
                             <AvatarFallback className="text-2xl">
                                 {(user.displayName || user.primaryEmail || 'U').charAt(0).toUpperCase()}
                             </AvatarFallback>

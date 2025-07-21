@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ArrowRight, Zap, Brain, Briefcase, Megaphone, FileText, Headphones, Layers } from "lucide-react";
 import Link from "next/link";
-import { db } from "@/lib/db";
+import { getDB } from "@/lib/db";
 import { categories, workflows } from "@/lib/db/schema";
 import { eq, count } from "drizzle-orm";
 
@@ -14,8 +14,9 @@ import { sql } from "drizzle-orm";
 export const dynamic = 'force-dynamic';
 
 export default async function CategoriesPage() {
+    const db = getDB();
     // Get categories with workflow counts
-    const categoriesWithCounts = await db.instance
+    const categoriesWithCounts = await db
         .select({
             id: categories.id,
             name: categories.name,

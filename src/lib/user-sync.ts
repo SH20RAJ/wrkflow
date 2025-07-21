@@ -1,4 +1,4 @@
-import { db } from "@/lib/db";
+import { getDB } from "@/lib/db";
 import { users } from "@/lib/db/schema";
 import { eq } from "drizzle-orm";
 
@@ -6,8 +6,9 @@ export async function syncUserToDatabase(stackUser: any) {
     if (!stackUser) return null;
 
     try {
+        const db = getDB();
         // Check if user already exists
-        const existingUser = await db.instance
+        const existingUser = await db
             .select()
             .from(users)
             .where(eq(users.id, stackUser.id))
@@ -15,7 +16,7 @@ export async function syncUserToDatabase(stackUser: any) {
 
         if (existingUser.length === 0) {
             // Create new user
-            await db.instance.insert(users).values({
+            await db.insert(users).values({
                 id: stackUser.id,
                 email: stackUser.primaryEmail || stackUser.id + "@example.com",
                 name: stackUser.displayName || "User",

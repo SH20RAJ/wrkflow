@@ -1,7 +1,7 @@
 "use server";
 
 import { redirect } from "next/navigation";
-import { db } from "@/lib/db";
+import { getDB } from "@/lib/db";
 import { workflows, users } from "@/lib/db/schema";
 import { eq } from "drizzle-orm";
 import { getCurrentUser } from "@/lib/auth";
@@ -57,7 +57,8 @@ export async function createWorkflow(formData: FormData) {
             }
         }
 
-        const [newWorkflow] = await db.instance
+        const db = getDB();
+        const [newWorkflow] = await db
             .insert(workflows)
             .values({
                 title: title.trim(),

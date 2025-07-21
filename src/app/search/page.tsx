@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Search, Filter, Eye, Download, Star } from "lucide-react";
 import Link from "next/link";
-import { db } from "@/lib/db";
+import { getDB } from "@/lib/db";
 import { workflows, users } from "@/lib/db/schema";
 import { eq, like, or, and } from "drizzle-orm";
 
@@ -46,7 +46,8 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
     // Only show public workflows in search
     whereConditions.push(eq(workflows.isPrivate, false));
 
-    const searchResults = await db.instance
+    const db = getDB();
+    const searchResults = await db
         .select({
             id: workflows.id,
             title: workflows.title,

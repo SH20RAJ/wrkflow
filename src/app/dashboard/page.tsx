@@ -3,7 +3,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Plus, Eye, Download, TrendingUp } from "lucide-react";
 import Link from "next/link";
-import { db } from "@/lib/db";
+import { getDB } from "@/lib/db";
 import { workflows } from "@/lib/db/schema";
 import { eq, desc, sum, count } from "drizzle-orm";
 
@@ -16,14 +16,15 @@ export default async function DashboardPage() {
     // This will trigger user sync to database
     await getCurrentUser();
 
+    const db = getDB();
     // Get user's workflows and stats
-    const userWorkflows = await db.instance
+    const userWorkflows = await db
         .select()
         .from(workflows)
         .where(eq(workflows.userId, user.id))
         .orderBy(desc(workflows.createdAt));
 
-    const stats = await db.instance
+    const stats = await db
         .select({
             totalViews: sum(workflows.viewCount),
             totalDownloads: sum(workflows.downloadCount),

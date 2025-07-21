@@ -1,4 +1,4 @@
-import { db } from '@/lib/db';
+import { getDB } from '@/lib/db';
 import * as schema from '@/lib/db/schema';
 import { eq } from 'drizzle-orm';
 
@@ -10,7 +10,8 @@ import { eq } from 'drizzle-orm';
  * Get a workflow by ID
  */
 export async function getWorkflowById(id: string) {
-    const [workflow] = await db.instance
+    const db = getDB();
+    const [workflow] = await db
         .select()
         .from(schema.workflows)
         .where(eq(schema.workflows.id, id))
@@ -24,8 +25,9 @@ export async function getWorkflowById(id: string) {
  */
 export async function getWorkflows(page: number = 1, pageSize: number = 10) {
     const offset = (page - 1) * pageSize;
+    const db = getDB();
 
-    const workflows = await db.instance
+    const workflows = await db
         .select()
         .from(schema.workflows)
         .limit(pageSize)
@@ -48,7 +50,8 @@ export async function getWorkflows(page: number = 1, pageSize: number = 10) {
  * Get a user by ID
  */
 export async function getUserById(id: string) {
-    const [user] = await db.instance
+    const db = getDB();
+    const [user] = await db
         .select()
         .from(schema.users)
         .where(eq(schema.users.id, id))
@@ -61,7 +64,8 @@ export async function getUserById(id: string) {
  * Get a user by email
  */
 export async function getUserByEmail(email: string) {
-    const [user] = await db.instance
+    const db = getDB();
+    const [user] = await db
         .select()
         .from(schema.users)
         .where(eq(schema.users.email, email))
@@ -81,12 +85,13 @@ export async function trackEvent(data: {
     userAgent?: string;
     ipAddress?: string;
 }) {
-    const [result] = await db.instance
+    const db = getDB();
+    const [result] = await db
         .insert(schema.analytics)
         .values({
             workflowId: data.workflowId,
             userId: data.userId,
-            eventType: data.eventType,
+            action: data.eventType,
             metadata: data.metadata ? JSON.stringify(data.metadata) : undefined,
             userAgent: data.userAgent,
             ipAddress: data.ipAddress,

@@ -19,7 +19,7 @@ import {
   ArrowUpDown
 } from "lucide-react";
 import Link from "next/link";
-import { db } from "@/lib/db";
+import { getDB } from "@/lib/db";
 import { workflows, users } from "@/lib/db/schema";
 import { eq } from "drizzle-orm";
 import type { Metadata } from "next";
@@ -39,8 +39,9 @@ export const metadata: Metadata = {
 };
 
 export default async function WorkflowsPage() {
+    const db = getDB();
     // Get all workflows with user info
-    const allWorkflows = await db.instance
+    const allWorkflows = await db
         .select({
             id: workflows.id,
             title: workflows.title,
