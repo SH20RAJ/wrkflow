@@ -59,17 +59,10 @@ export default async function ProfilePage() {
         .select()
         .from(collections)
         .where(eq(collections.userId, user.id))
-        .orderBy(desc(collections.updatedAt));
-
-    // Get user's collections
-    const userCollections = await db
-        .select()
-        .from(collections)
-        .where(eq(collections.userId, user.id))
         .orderBy(desc(collections.createdAt));
 
-    const publicWorkflows = userWorkflows.filter((w: any) => !w.isPrivate);
-    const privateWorkflows = userWorkflows.filter((w: any) => w.isPrivate);
+    const publicWorkflows = userWorkflows.filter((w) => !w.isPrivate);
+    const privateWorkflows = userWorkflows.filter((w) => w.isPrivate);
 
     return (
         <MainLayout>
@@ -78,7 +71,7 @@ export default async function ProfilePage() {
                 <div className="mb-8">
                     <div className="flex items-center gap-6 mb-6">
                         <Avatar className="h-24 w-24">
-                            <AvatarImage src={user.avatar || ''} />
+                            <AvatarImage src="" />
                             <AvatarFallback className="text-2xl">
                                 {(user.displayName || user.primaryEmail || 'U').charAt(0).toUpperCase()}
                             </AvatarFallback>
@@ -211,11 +204,11 @@ export default async function ProfilePage() {
                                         </CardHeader>
                                         <CardContent>
                                             <div className="flex items-center justify-between text-sm text-muted-foreground mb-4">
-                                                <span>By {saved.authorName || saved.authorEmail}</span>
+                                                <span>Saved workflow</span>
                                                 <div className="flex items-center gap-3">
                                                     <span className="flex items-center gap-1">
                                                         <Eye className="h-3 w-3" />
-                                                        {saved.viewCount}
+                                                        {saved.viewCount || 0}
                                                     </span>
                                                     <span className="flex items-center gap-1">
                                                         <Download className="h-3 w-3" />

@@ -6,7 +6,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { ArrowLeft, Download, Eye, Star, Share, Calendar, Copy } from "lucide-react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { db } from "@/lib/db";
+import { getDB } from "@/lib/db";
 import { workflows, users } from "@/lib/db/schema";
 import { eq } from "drizzle-orm";
 import ReactMarkdown from "react-markdown";
@@ -22,7 +22,9 @@ interface WorkflowPageProps {
 
 export default async function WorkflowPage({ params }: WorkflowPageProps) {
     const { id } = await params;
-    const workflow = await db.instance
+    
+    const db = getDB();
+    const workflow = await db
         .select({
             id: workflows.id,
             title: workflows.title,
@@ -90,7 +92,7 @@ export default async function WorkflowPage({ params }: WorkflowPageProps) {
                                 </span>
                                 <span className="flex items-center gap-1">
                                     <Calendar className="h-4 w-4" />
-                                    {new Date(workflowData.createdAt).toLocaleDateString()}
+                                    {workflowData.createdAt ? new Date(workflowData.createdAt).toLocaleDateString() : 'Unknown date'}
                                 </span>
                             </div>
                         </div>
@@ -213,7 +215,7 @@ export default async function WorkflowPage({ params }: WorkflowPageProps) {
                                 <div className="flex justify-between">
                                     <span className="text-muted-foreground">Created</span>
                                     <span className="font-medium">
-                                        {new Date(workflowData.createdAt).toLocaleDateString()}
+                                        {workflowData.createdAt ? new Date(workflowData.createdAt).toLocaleDateString() : 'Unknown date'}
                                     </span>
                                 </div>
                             </CardContent>
