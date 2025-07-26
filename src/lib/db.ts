@@ -31,55 +31,80 @@ function createHttpD1Client() {
     async prepare(query: string) {
       return {
         async all(params: unknown[] = []) {
-          const response = await fetch(
-            `https://api.cloudflare.com/client/v4/accounts/${accountId}/d1/database/${databaseId}/query`,
-            {
-              method: 'POST',
-              headers: {
-                'Authorization': `Bearer ${token}`,
-                'Content-Type': 'application/json',
-              },
-              body: JSON.stringify({ sql: query, params }),
+          try {
+            const response = await fetch(
+              `https://api.cloudflare.com/client/v4/accounts/${accountId}/d1/database/${databaseId}/query`,
+              {
+                method: 'POST',
+                headers: {
+                  'Authorization': `Bearer ${token}`,
+                  'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ sql: query, params }),
+                signal: AbortSignal.timeout(30000), // 30 second timeout
+              }
+            );
+            
+            if (!response.ok) {
+              const error = await response.text();
+              throw new Error(`Database query failed: ${error}`);
             }
-          );
-          
-          if (!response.ok) {
-            const error = await response.text();
-            throw new Error(`Database query failed: ${error}`);
+            
+            const data = await response.json() as D1Response;
+            return {
+              results: data.result?.[0]?.results || [],
+              meta: data.result?.[0]?.meta || {},
+              success: data.success
+            };
+          } catch (error) {
+            console.error('D1 HTTP query failed:', error);
+            // Return empty results instead of throwing to prevent app crashes
+            return {
+              results: [],
+              meta: {},
+              success: false,
+              error: error instanceof Error ? error.message : 'Unknown error'
+            };
           }
-          
-          const data = await response.json() as D1Response;
-          return {
-            results: data.result?.[0]?.results || [],
-            meta: data.result?.[0]?.meta || {},
-            success: data.success
-          };
         },
         async run(params: unknown[] = []) {
-          const response = await fetch(
-            `https://api.cloudflare.com/client/v4/accounts/${accountId}/d1/database/${databaseId}/query`,
-            {
-              method: 'POST',
-              headers: {
-                'Authorization': `Bearer ${token}`,
-                'Content-Type': 'application/json',
-              },
-              body: JSON.stringify({ sql: query, params }),
+          try {
+            const response = await fetch(
+              `https://api.cloudflare.com/client/v4/accounts/${accountId}/d1/database/${databaseId}/query`,
+              {
+                method: 'POST',
+                headers: {
+                  'Authorization': `Bearer ${token}`,
+                  'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ sql: query, params }),
+                signal: AbortSignal.timeout(30000), // 30 second timeout
+              }
+            );
+            
+            if (!response.ok) {
+              const error = await response.text();
+              throw new Error(`Database query failed: ${error}`);
             }
-          );
-          
-          if (!response.ok) {
-            const error = await response.text();
-            throw new Error(`Database query failed: ${error}`);
+            
+            const data = await response.json() as D1Response;
+            return {
+              changes: data.result?.[0]?.meta?.changes || 0,
+              duration: data.result?.[0]?.meta?.duration || 0,
+              last_row_id: data.result?.[0]?.meta?.last_row_id || null,
+              success: data.success
+            };
+          } catch (error) {
+            console.error('D1 HTTP query failed:', error);
+            // Return empty results instead of throwing to prevent app crashes
+            return {
+              changes: 0,
+              duration: 0,
+              last_row_id: null,
+              success: false,
+              error: error instanceof Error ? error.message : 'Unknown error'
+            };
           }
-          
-          const data = await response.json() as D1Response;
-          return {
-            changes: data.result?.[0]?.meta?.changes || 0,
-            duration: data.result?.[0]?.meta?.duration || 0,
-            last_row_id: data.result?.[0]?.meta?.last_row_id || null,
-            success: data.success
-          };
         }
       };
     }
@@ -91,14 +116,22 @@ export function getDB() {
   try {
     const { env } = getCloudflareContext();
     if (env?.DB) {
+      console.info('Using Cloudflare Workers D1 binding');
       return drizzle(env.DB, { schema });
     }
   } catch {
     // If binding is not available, fall back to HTTP client
+    console.info('Cloudflare Workers binding not available, using HTTP client');
   }
   
   // Use HTTP client for Next.js dev server
-  const httpClient = createHttpD1Client();
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  return drizzle(httpClient as any, { schema });
+  try {
+    const httpClient = createHttpD1Client();
+    console.info('Using D1 HTTP client for database access');
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    return drizzle(httpClient as any, { schema });
+  } catch (error) {
+    console.error('Failed to create D1 client:', error);
+    throw new Error('Database connection failed. Please check your Cloudflare credentials.');
+  }
 }

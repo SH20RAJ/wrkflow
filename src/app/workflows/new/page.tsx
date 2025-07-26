@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { MainLayout } from "@/components/layout/main-layout";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -9,14 +10,13 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { ArrowLeft, Upload, Copy, Eye, EyeOff, Image, Video, FileText, ChevronRight, ChevronLeft, Check } from "lucide-react";
+import { ArrowLeft, Upload, Image as ImageIcon, Video, FileText, ChevronRight, ChevronLeft, Check, Loader2 } from "lucide-react";
 import Link from "next/link";
-import { createWorkflow } from "./actions";
-import { FormSubmitButton } from "@/components/ui/form-submit-button";
-import { FileUpload } from "@/components/ui/file-upload";
+import NextImage from "next/image";
 import { MediaGallery } from "@/components/ui/media-gallery";
-import { YouTubeEmbed } from "@/components/ui/youtube-embed";
 import { Badge } from "@/components/ui/badge";
+import { useAuth } from "@/hooks/use-auth";
+import { toast } from "sonner";
 
 interface MediaItem {
     id: string;
@@ -26,7 +26,10 @@ interface MediaItem {
 }
 
 export default function NewWorkflowPage() {
+    const router = useRouter();
+    const { user } = useAuth();
     const [currentStep, setCurrentStep] = useState(1);
+    const [isSubmitting, setIsSubmitting] = useState(false);
     const [jsonInput, setJsonInput] = useState('');
     const [jsonUrl, setJsonUrl] = useState('');
     const [inputMethod, setInputMethod] = useState<'paste' | 'url'>('paste');
@@ -43,7 +46,7 @@ export default function NewWorkflowPage() {
 
     const steps = [
         { id: 1, title: "Basic Info", description: "Title, description, and category", icon: FileText },
-        { id: 2, title: "Media & Demo", description: "Images, videos, and screenshots", icon: Image },
+        { id: 2, title: "Media & Demo", description: "Images, videos, and screenshots", icon: ImageIcon },
         { id: 3, title: "Workflow Data", description: "JSON content and configuration", icon: Upload },
         { id: 4, title: "Documentation", description: "How it works and instructions", icon: Video }
     ];
@@ -55,6 +58,7 @@ export default function NewWorkflowPage() {
             setJsonPreview(parsed);
             return true;
         } catch (error) {
+            console.error('Error parsing JSON:', error);
             setJsonError('Invalid JSON format');
             setJsonPreview(null);
             return false;
@@ -103,14 +107,44 @@ export default function NewWorkflowPage() {
     };
 
     const handleSubmit = async (formData: FormData) => {
-        // Add media data to form
-        formData.append('youtubeUrl', youtubeUrl);
-        formData.append('posterImage', posterImage);
-        formData.append('screenshots', JSON.stringify(screenshots));
-        formData.append('demoImages', JSON.stringify(demoImages));
-        formData.append('tags', JSON.stringify(tags));
-        
-        await createWorkflow(formData);
+        if (!user) {
+            toast.error("Please sign in to create a workflow");
+            return;
+        }
+
+        setIsSubmitting(true);
+        try {
+            // Add additional data to form
+            formData.append('youtubeUrl', youtubeUrl);
+            formData.append('posterImage', posterImage);
+            formData.append('screenshots', JSON.stringify(screenshots));
+            formData.append('demoImages', JSON.stringify(demoImages));
+            formData.append('tags', JSON.stringify(tags));
+            formData.append('userId', user.id);
+            
+            const response = await fetch('/api/workflows', {
+                method: 'POST',
+                body: formData,
+            });
+
+            const result = await response.json() as { 
+                success: boolean; 
+                workflow?: { id: string }; 
+                error?: string; 
+            };
+
+            if (result.success) {
+                toast.success("Workflow created successfully!");
+                router.push(`/workflows/${result.workflow?.id}`);
+            } else {
+                toast.error(result.error || "Failed to create workflow");
+            }
+        } catch (error) {
+            console.error('Error creating workflow:', error);
+            toast.error("An unexpected error occurred");
+        } finally {
+            setIsSubmitting(false);
+        }
     };
 
     return (
@@ -269,7 +303,7 @@ export default function NewWorkflowPage() {
                             <Card>
                                 <CardHeader>
                                     <CardTitle className="flex items-center gap-2">
-                                        <Image className="w-5 h-5" />
+                                        <ImageIcon className="w-5 h-5" />
                                         Media & Demo Content
                                     </CardTitle>
                                     <CardDescription>
@@ -292,9 +326,11 @@ export default function NewWorkflowPage() {
                                         />
                                         {posterImage && (
                                             <div className="max-w-md">
-                                                <img 
+                                                <NextImage 
                                                     src={posterImage} 
                                                     alt="Poster preview" 
+                                                    width={400}
+                                                    height={225}
                                                     className="w-full rounded-lg border"
                                                     onError={(e) => {
                                                         const target = e.target as HTMLImageElement;
@@ -311,11 +347,16 @@ export default function NewWorkflowPage() {
                                             <Label>Demo Video</Label>
                                             <p className="text-sm text-muted-foreground">Add a YouTube video demonstrating your workflow</p>
                                         </div>
-                                        <YouTubeEmbed
-                                            url={youtubeUrl}
-                                            onUrlChange={setYoutubeUrl}
-                                            editable={true}
+                                        <Input
+                                            placeholder="https://youtube.com/watch?v=..."
+                                            value={youtubeUrl}
+                                            onChange={(e) => setYoutubeUrl(e.target.value)}
                                         />
+                                        {youtubeUrl && (
+                                            <div className="aspect-video bg-muted rounded-lg flex items-center justify-center">
+                                                <Video className="h-12 w-12 text-muted-foreground" />
+                                            </div>
+                                        )}
                                     </div>
 
                                     {/* Screenshots */}
@@ -478,9 +519,24 @@ export default function NewWorkflowPage() {
                                 <ChevronRight className="w-4 h-4 ml-2" />
                             </Button>
                         ) : (
-                            <FormSubmitButton>
-                                Create Workflow
-                            </FormSubmitButton>
+                            <Button 
+                                type="submit" 
+                                size="lg" 
+                                className="w-full sm:w-auto"
+                                disabled={isSubmitting}
+                            >
+                                {isSubmitting ? (
+                                    <>
+                                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                        Creating...
+                                    </>
+                                ) : (
+                                    <>
+                                        <Check className="mr-2 h-4 w-4" />
+                                        Create Workflow
+                                    </>
+                                )}
+                            </Button>
                         )}
                     </div>
                 </form>
