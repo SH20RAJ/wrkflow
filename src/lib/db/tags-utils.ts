@@ -18,7 +18,7 @@ export async function createOrGetTags(tagNames: string[]): Promise<string[]> {
         const existingTag = await db
             .select({ id: tags.id })
             .from(tags)
-            .where(eq(tags.slug, slug))
+            .where(eq(tags.name, tagName.trim()))
             .limit(1);
 
         if (existingTag.length > 0) {
@@ -29,7 +29,6 @@ export async function createOrGetTags(tagNames: string[]): Promise<string[]> {
                 .insert(tags)
                 .values({
                     name: tagName.trim(),
-                    slug: slug,
                 })
                 .returning({ id: tags.id });
 
@@ -72,7 +71,6 @@ export async function getWorkflowTags(workflowId: string) {
         .select({
             id: tags.id,
             name: tags.name,
-            slug: tags.slug,
         })
         .from(tags)
         .innerJoin(workflowsToTags, eq(tags.id, workflowsToTags.tagId))

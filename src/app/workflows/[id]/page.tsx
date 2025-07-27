@@ -15,8 +15,8 @@ import { getCurrentUser } from "@/lib/auth";
 import { WorkflowActions } from "@/components/workflow-actions";
 import { WorkflowViewTracker } from "@/components/workflow-view-tracker";
 import { JsonCopyButton } from "@/components/json-copy-button";
-import { WorkflowRatings } from "@/components/workflow-ratings";
-import { WorkflowComments } from "@/components/workflow-comments";
+import { WorkflowRatingsServer } from "@/components/workflow-ratings-server";
+import { WorkflowCommentsServer } from "@/components/workflow-comments-server";
 import { RatingDisplay } from "@/components/rating-display";
 
 // Force dynamic rendering to ensure database access happens at request time
@@ -25,7 +25,6 @@ export const dynamic = 'force-dynamic';
 interface WorkflowTag {
     id: string;
     name: string;
-    slug: string;
 }
 
 interface RatingStats {
@@ -106,7 +105,6 @@ export default async function WorkflowPage({ params }: WorkflowPageProps) {
         .select({
             id: tags.id,
             name: tags.name,
-            slug: tags.slug,
         })
         .from(tags)
         .innerJoin(workflowsToTags, eq(tags.id, workflowsToTags.tagId))
@@ -320,12 +318,18 @@ export default async function WorkflowPage({ params }: WorkflowPageProps) {
 
                 {/* Ratings and Reviews Section */}
                 <div className="mt-12">
-                    <WorkflowRatings workflowId={workflowData.id} />
+                    <WorkflowRatingsServer
+                        workflowId={workflowData.id}
+                        currentUserId={currentUser?.id}
+                    />
                 </div>
 
                 {/* Comments Section */}
                 <div className="mt-8">
-                    <WorkflowComments workflowId={workflowData.id} />
+                    <WorkflowCommentsServer
+                        workflowId={workflowData.id}
+                        currentUserId={currentUser?.id}
+                    />
                 </div>
             </div>
         </MainLayout>
