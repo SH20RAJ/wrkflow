@@ -7,8 +7,9 @@ import { ArrowLeft, Eye, Calendar, Download } from "lucide-react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getDB } from "@/lib/db";
-import { workflows, users } from "@/lib/db/schema";
-import { eq } from "drizzle-orm";
+import { workflows, users, ratings } from "@/lib/db/schema";
+import { tags, workflowsToTags } from "@/lib/db/schema/tags";
+import { eq, avg, count } from "drizzle-orm";
 import ReactMarkdown from "react-markdown";
 import { getCurrentUser } from "@/lib/auth";
 import { WorkflowActions } from "@/components/workflow-actions";
@@ -27,6 +28,33 @@ interface WorkflowTag {
     slug: string;
 }
 
+interface RatingStats {
+    averageRating: number;
+    totalRatings: number;
+}
+
+interface WorkflowData {
+    id: string;
+    title: string;
+    description: string;
+    isPaid: boolean;
+    price: number | null;
+    viewCount: number;
+    downloadCount: number;
+    createdAt: Date | null;
+    howItWorks: string | null;
+    stepByStep: string | null;
+    jsonContent: string | null;
+    jsonUrl: string | null;
+    coverImage: string | null;
+    userId: string;
+    userName: string | null;
+    userEmail: string | null;
+    userAvatar: string | null;
+    workflowTags: WorkflowTag[];
+    ratingStats: RatingStats;
+}
+
 interface WorkflowPageProps {
     params: Promise<{
         id: string;
@@ -40,6 +68,8 @@ export default async function WorkflowPage({ params }: WorkflowPageProps) {
     const currentUser = await getCurrentUser();
 
     const db = getDB();
+
+    // Fetch main workflow data
     const workflow = await db
         .select({
             id: workflows.id,
@@ -69,8 +99,39 @@ export default async function WorkflowPage({ params }: WorkflowPageProps) {
         notFound();
     }
 
-    const workflowData = workflow[0];
-    const canEdit = currentUser && currentUser.id === workflowData.userId;
+    const baseWorkflowData = workflow[0];
+
+    // Fetch tags for this workflow
+    const workflowTags = await db
+        .select({
+            id: tags.id,
+            name: tags.name,
+            slug: tags.slug,
+        })
+        .from(tags)
+        .innerJoin(workflowsToTags, eq(tags.id, workflowsToTags.tagId))
+        .where(eq(workflowsToTags.workflowId, id));
+
+    // Fetch rating statistics
+    const [ratingStats] = await db
+        .select({
+            averageRating: avg(ratings.rating),
+            totalRatings: count(ratings.id),
+        })
+        .from(ratings)
+        .where(eq(ratings.workflowId, id));
+
+    // Combine all data
+    const workflowData: WorkflowData = {
+        ...baseWorkflowData,
+        workflowTags: workflowTags,
+        ratingStats: {
+            averageRating: ratingStats.averageRating ? Number(ratingStats.averageRating) : 0,
+            totalRatings: ratingStats.totalRatings || 0,
+        }
+    };
+
+    const canEdit = currentUser ? currentUser.id === workflowData.userId : false;
 
     return (
         <MainLayout>

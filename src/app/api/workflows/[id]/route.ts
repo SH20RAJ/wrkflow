@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getDB } from '@/lib/db';
-import { workflows, users, tags, workflowsToTags, ratings } from '@/lib/db/schema';
+import { workflows, users, ratings } from '@/lib/db/schema';
+import { tags, workflowsToTags } from '@/lib/db/schema/tags';
 import { eq, avg, count } from 'drizzle-orm';
 import { createOrGetTags, associateTagsWithWorkflow } from '@/lib/db/tags-utils';
 

@@ -1,5 +1,5 @@
 import { getDB } from '@/lib/db';
-import { tags, workflowsToTags } from '@/lib/db/schema';
+import { tags, workflowsToTags } from '@/lib/db/schema/tags';
 import { eq, inArray } from 'drizzle-orm';
 
 /**
