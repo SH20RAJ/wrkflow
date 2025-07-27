@@ -15,6 +15,7 @@ import { WorkflowActions } from "@/components/workflow-actions";
 import { WorkflowViewTracker } from "@/components/workflow-view-tracker";
 import { JsonCopyButton } from "@/components/json-copy-button";
 import { WorkflowRatings } from "@/components/workflow-ratings";
+import { WorkflowComments } from "@/components/workflow-comments";
 
 // Force dynamic rendering to ensure database access happens at request time
 export const dynamic = 'force-dynamic';
@@ -240,6 +241,11 @@ export default async function WorkflowPage({ params }: WorkflowPageProps) {
                 {/* Ratings and Reviews Section */}
                 <div className="mt-12">
                     <WorkflowRatings workflowId={workflowData.id} />
+                </div>
+
+                {/* Comments Section */}
+                <div className="mt-8">
+                    <WorkflowComments workflowId={workflowData.id} />
                 </div>
             </div>
         </MainLayout>
