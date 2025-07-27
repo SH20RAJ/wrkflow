@@ -38,6 +38,7 @@ export default function NewWorkflowPage() {
     const [jsonPreview, setJsonPreview] = useState<Record<string, unknown> | null>(null);
     const [tags, setTags] = useState<string[]>([]);
     const [newTag, setNewTag] = useState('');
+    const [title, setTitle] = useState('');
     const [slug, setSlug] = useState('');
     const [slugError, setSlugError] = useState('');
 
@@ -109,14 +110,34 @@ export default function NewWorkflowPage() {
         }
     };
 
-    const handleSubmit = async (formData: FormData) => {
+    const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+        event.preventDefault();
+
         if (!user) {
             toast.error("Please sign in to create a workflow");
             return;
         }
 
+        // Validate required fields
+        if (!title.trim()) {
+            toast.error("Please enter a workflow title");
+            return;
+        }
+
+        if (!slug.trim()) {
+            toast.error("Please enter a URL slug");
+            return;
+        }
+
+        if (slugError) {
+            toast.error("Please fix the slug error before submitting");
+            return;
+        }
+
         setIsSubmitting(true);
         try {
+            const formData = new FormData(event.currentTarget);
+
             // Add additional data to form
             formData.append('slug', slug);
             formData.append('youtubeUrl', youtubeUrl);
@@ -125,6 +146,12 @@ export default function NewWorkflowPage() {
             formData.append('demoImages', JSON.stringify(demoImages));
             formData.append('tags', JSON.stringify(tags));
             formData.append('userId', user.id);
+
+            // Debug: Log form data
+            console.log('Form data being sent:');
+            for (const [key, value] of formData.entries()) {
+                console.log(`${key}: ${value}`);
+            }
 
             const response = await fetch('/api/workflows', {
                 method: 'POST',
@@ -139,7 +166,7 @@ export default function NewWorkflowPage() {
 
             if (result.success) {
                 toast.success("Workflow created successfully!");
-                router.push(`/workflows/${result.workflow?.id}`);
+                router.push(`/workflows/w/${result.workflow?.slug || result.workflow?.id}`);
             } else {
                 toast.error(result.error || "Failed to create workflow");
             }
@@ -199,7 +226,7 @@ export default function NewWorkflowPage() {
                     </div>
                 </div>
 
-                <form action={handleSubmit} className="space-y-8">
+                <form onSubmit={handleSubmit} className="space-y-8">
                     {/* Step 1: Basic Information */}
                     {currentStep === 1 && (
                         <div className="space-y-6">
@@ -219,10 +246,12 @@ export default function NewWorkflowPage() {
                                         <Input
                                             id="title"
                                             name="title"
+                                            value={title}
                                             placeholder="e.g., Automated Email Marketing Campaign"
                                             required
                                             className="text-lg"
                                             onChange={(e) => {
+                                                setTitle(e.target.value);
                                                 // Auto-generate slug from title if slug is empty
                                                 if (!slug) {
                                                     const generatedSlug = generateSlugFromTitle(e.target.value);

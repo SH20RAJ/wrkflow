@@ -317,7 +317,10 @@ export async function POST(request: NextRequest) {
 
         return NextResponse.json({
             success: true,
-            workflow: newWorkflow,
+            workflow: {
+                ...newWorkflow,
+                slug: finalSlug
+            },
             message: "Workflow created successfully"
         });
     } catch (error) {
