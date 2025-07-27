@@ -1,4 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
+import { getDB } from '@/lib/db';
+import { workflows, users } from '@/lib/db/schema';
+import { eq } from 'drizzle-orm';
 
 /**
  * GET /api/workflows/[id]
@@ -10,52 +13,49 @@ export async function GET(
 ) {
     try {
         const { id } = await params;
+        const db = getDB();
 
-        // Mock response - will be replaced with actual database query
-        const workflow = {
-            id,
-            title: `Sample Workflow ${id}`,
-            description: `This is a detailed description for workflow ${id}. It includes information about what the workflow does, how it works, and what technologies it uses.`,
-            longDescription: `# Workflow Description\n\nThis workflow automates the process of gathering data from multiple sources, processing it, and sending notifications to relevant channels.\n\n## Features\n\n- Data collection from multiple APIs\n- Automated processing and filtering\n- Notification delivery to Slack and email\n- Scheduled execution\n\n## Requirements\n\n- N8N version 0.170.0 or higher\n- API keys for integrated services`,
-            category: "marketing",
-            technologies: ["openai", "slack", "github"],
-            author: {
-                id: "user-1",
-                name: "John Doe",
-                avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=John",
-            },
-            price: 1500, // Price in cents
-            createdAt: new Date(Date.now() - 7 * 86400000).toISOString(), // 7 days ago
-            updatedAt: new Date(Date.now() - 2 * 86400000).toISOString(), // 2 days ago
-            downloads: 120,
-            rating: 4.5,
-            reviews: [
-                {
-                    id: "review-1",
-                    userId: "user-2",
-                    userName: "Jane Smith",
-                    rating: 5,
-                    comment: "This workflow saved me hours of manual work!",
-                    createdAt: new Date(Date.now() - 5 * 86400000).toISOString(),
-                },
-                {
-                    id: "review-2",
-                    userId: "user-3",
-                    userName: "Bob Johnson",
-                    rating: 4,
-                    comment: "Great workflow, but could use better documentation.",
-                    createdAt: new Date(Date.now() - 3 * 86400000).toISOString(),
-                },
-            ],
-            version: "1.2.0",
-            compatibleN8nVersions: ">=0.170.0",
-            previewImages: [
-                "https://via.placeholder.com/800x450?text=Workflow+Preview+1",
-                "https://via.placeholder.com/800x450?text=Workflow+Preview+2",
-            ],
-        };
+        const workflow = await db
+            .select({
+                id: workflows.id,
+                title: workflows.title,
+                description: workflows.description,
+                isPaid: workflows.isPaid,
+                price: workflows.price,
+                viewCount: workflows.viewCount,
+                downloadCount: workflows.downloadCount,
+                createdAt: workflows.createdAt,
+                updatedAt: workflows.updatedAt,
+                howItWorks: workflows.howItWorks,
+                stepByStep: workflows.stepByStep,
+                jsonContent: workflows.jsonContent,
+                jsonUrl: workflows.jsonUrl,
+                coverImage: workflows.coverImage,
+                posterImage: workflows.posterImage,
+                youtubeUrl: workflows.youtubeUrl,
+                screenshots: workflows.screenshots,
+                demoImages: workflows.demoImages,
+                tags: workflows.tags,
+                categoryId: workflows.categoryId,
+                isPrivate: workflows.isPrivate,
+                userId: workflows.userId,
+                userName: users.name,
+                userEmail: users.email,
+                userAvatar: users.avatar,
+            })
+            .from(workflows)
+            .leftJoin(users, eq(workflows.userId, users.id))
+            .where(eq(workflows.id, id))
+            .limit(1);
 
-        return NextResponse.json(workflow);
+        if (!workflow.length) {
+            return NextResponse.json(
+                { error: "Workflow not found" },
+                { status: 404 }
+            );
+        }
+
+        return NextResponse.json(workflow[0]);
     } catch (error) {
         console.error(`Error fetching workflow:`, error);
         return NextResponse.json(
@@ -75,24 +75,85 @@ export async function PUT(
 ) {
     try {
         const { id } = await params;
-        const body = await request.json() as Record<string, unknown>;
+        const contentType = request.headers.get('content-type') || '';
+        let updateData: Record<string, unknown>;
 
-        // Validate request body
-        if (!body.title && !body.description && !body.category) {
+        if (contentType.includes('application/json')) {
+            updateData = await request.json();
+        } else {
+            // Handle FormData payload
+            const formData = await request.formData();
+            updateData = {};
+
+            for (const [key, value] of formData.entries()) {
+                if (key === 'isPaid' || key === 'isPrivate') {
+                    updateData[key] = value === 'true';
+                } else if (key === 'price') {
+                    updateData[key] = value ? parseFloat(value as string) : null;
+                } else {
+                    updateData[key] = value as string;
+                }
+            }
+        }
+
+        // Remove undefined/null values and userId (shouldn't be updated)
+        const cleanedData = Object.fromEntries(
+            Object.entries(updateData).filter(([key, value]) =>
+                value !== undefined && value !== null && value !== '' && key !== 'userId'
+            )
+        );
+
+        if (Object.keys(cleanedData).length === 0) {
             return NextResponse.json(
                 { error: "No valid fields to update" },
                 { status: 400 }
             );
         }
 
-        // Mock response - will be replaced with actual database update
-        const updatedWorkflow = {
-            id,
-            ...body,
-            updatedAt: new Date().toISOString(),
-        };
+        // Validate JSON format if content is provided
+        if (cleanedData.jsonContent) {
+            try {
+                JSON.parse(cleanedData.jsonContent as string);
+            } catch (error) {
+                console.error('Invalid JSON format:', error);
+                return NextResponse.json(
+                    { error: "Invalid JSON format. Please check your workflow JSON." },
+                    { status: 400 }
+                );
+            }
+        }
 
-        return NextResponse.json(updatedWorkflow);
+        const db = getDB();
+
+        // First check if workflow exists and get current user
+        const existingWorkflow = await db
+            .select({ userId: workflows.userId })
+            .from(workflows)
+            .where(eq(workflows.id, id))
+            .limit(1);
+
+        if (!existingWorkflow.length) {
+            return NextResponse.json(
+                { error: "Workflow not found" },
+                { status: 404 }
+            );
+        }
+
+        // Add updatedAt timestamp
+        cleanedData.updatedAt = new Date();
+
+        // Update the workflow
+        const [updatedWorkflow] = await db
+            .update(workflows)
+            .set(cleanedData)
+            .where(eq(workflows.id, id))
+            .returning();
+
+        return NextResponse.json({
+            success: true,
+            workflow: updatedWorkflow,
+            message: "Workflow updated successfully"
+        });
     } catch (error) {
         console.error(`Error updating workflow:`, error);
         return NextResponse.json(
@@ -112,9 +173,32 @@ export async function DELETE(
 ) {
     try {
         const { id } = await params;
+        const db = getDB();
 
-        // Mock response - will be replaced with actual database deletion
-        return NextResponse.json({ success: true, deletedId: id });
+        // First check if workflow exists
+        const existingWorkflow = await db
+            .select({ id: workflows.id })
+            .from(workflows)
+            .where(eq(workflows.id, id))
+            .limit(1);
+
+        if (!existingWorkflow.length) {
+            return NextResponse.json(
+                { error: "Workflow not found" },
+                { status: 404 }
+            );
+        }
+
+        // Delete the workflow
+        await db
+            .delete(workflows)
+            .where(eq(workflows.id, id));
+
+        return NextResponse.json({
+            success: true,
+            deletedId: id,
+            message: "Workflow deleted successfully"
+        });
     } catch (error) {
         console.error(`Error deleting workflow:`, error);
         return NextResponse.json(

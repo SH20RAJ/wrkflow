@@ -3,13 +3,14 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { ArrowLeft, Download, Eye, Star, Share, Calendar, Copy } from "lucide-react";
+import { ArrowLeft, Download, Eye, Star, Share, Calendar, Copy, Edit } from "lucide-react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getDB } from "@/lib/db";
 import { workflows, users } from "@/lib/db/schema";
 import { eq } from "drizzle-orm";
 import ReactMarkdown from "react-markdown";
+import { getCurrentUser } from "@/lib/auth";
 
 // Force dynamic rendering to ensure database access happens at request time
 export const dynamic = 'force-dynamic';
@@ -22,7 +23,10 @@ interface WorkflowPageProps {
 
 export default async function WorkflowPage({ params }: WorkflowPageProps) {
     const { id } = await params;
-    
+
+    // Get current user to check if they can edit
+    const currentUser = await getCurrentUser();
+
     const db = getDB();
     const workflow = await db
         .select({
@@ -39,6 +43,7 @@ export default async function WorkflowPage({ params }: WorkflowPageProps) {
             jsonContent: workflows.jsonContent,
             jsonUrl: workflows.jsonUrl,
             coverImage: workflows.coverImage,
+            userId: workflows.userId,
             userName: users.name,
             userEmail: users.email,
             userAvatar: users.avatar,
@@ -53,6 +58,7 @@ export default async function WorkflowPage({ params }: WorkflowPageProps) {
     }
 
     const workflowData = workflow[0];
+    const canEdit = currentUser && currentUser.id === workflowData.userId;
 
     return (
         <MainLayout>
@@ -160,7 +166,16 @@ export default async function WorkflowPage({ params }: WorkflowPageProps) {
                                             Download Free
                                         </Button>
                                     )}
-                                    
+
+                                    {canEdit && (
+                                        <Button variant="outline" size="sm" className="w-full" asChild>
+                                            <Link href={`/workflows/${workflowData.id}/edit`}>
+                                                <Edit className="mr-2 h-4 w-4" />
+                                                Edit Workflow
+                                            </Link>
+                                        </Button>
+                                    )}
+
                                     <div className="flex gap-2">
                                         <Button variant="outline" size="sm" className="flex-1">
                                             <Star className="mr-2 h-4 w-4" />
