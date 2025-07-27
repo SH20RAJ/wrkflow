@@ -6,6 +6,7 @@ import { categories } from './categories';
 export const workflows = sqliteTable('workflows', {
     id: text('id').primaryKey().$defaultFn(() => createId()),
     title: text('title').notNull(),
+    slug: text('slug').notNull().unique(),
     description: text('description').notNull(),
     userId: text('user_id').notNull().references(() => users.id),
     jsonUrl: text('json_url'),

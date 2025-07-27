@@ -17,6 +17,7 @@ import { MediaGallery } from "@/components/ui/media-gallery";
 import { Badge } from "@/components/ui/badge";
 import { useAuth } from "@/hooks/use-auth";
 import { toast } from "sonner";
+import { generateSlugFromTitle, validateSlug, isSlugAvailable } from "@/lib/slug-utils";
 
 interface MediaItem {
     id: string;
@@ -37,7 +38,9 @@ export default function NewWorkflowPage() {
     const [jsonPreview, setJsonPreview] = useState<Record<string, unknown> | null>(null);
     const [tags, setTags] = useState<string[]>([]);
     const [newTag, setNewTag] = useState('');
-    
+    const [slug, setSlug] = useState('');
+    const [slugError, setSlugError] = useState('');
+
     // New media states
     const [youtubeUrl, setYoutubeUrl] = useState('');
     const [posterImage, setPosterImage] = useState('');
@@ -115,22 +118,23 @@ export default function NewWorkflowPage() {
         setIsSubmitting(true);
         try {
             // Add additional data to form
+            formData.append('slug', slug);
             formData.append('youtubeUrl', youtubeUrl);
             formData.append('posterImage', posterImage);
             formData.append('screenshots', JSON.stringify(screenshots));
             formData.append('demoImages', JSON.stringify(demoImages));
             formData.append('tags', JSON.stringify(tags));
             formData.append('userId', user.id);
-            
+
             const response = await fetch('/api/workflows', {
                 method: 'POST',
                 body: formData,
             });
 
-            const result = await response.json() as { 
-                success: boolean; 
-                workflow?: { id: string }; 
-                error?: string; 
+            const result = await response.json() as {
+                success: boolean;
+                workflow?: { id: string };
+                error?: string;
             };
 
             if (result.success) {
@@ -168,17 +172,16 @@ export default function NewWorkflowPage() {
                             const Icon = step.icon;
                             const isActive = currentStep === step.id;
                             const isCompleted = currentStep > step.id;
-                            
+
                             return (
                                 <div key={step.id} className="flex items-center">
                                     <div className={`flex flex-col items-center ${isActive ? 'text-primary' : isCompleted ? 'text-green-600' : 'text-muted-foreground'}`}>
-                                        <div className={`flex items-center justify-center w-12 h-12 rounded-full border-2 mb-2 ${
-                                            isActive 
-                                                ? 'bg-primary border-primary text-primary-foreground' 
-                                                : isCompleted
+                                        <div className={`flex items-center justify-center w-12 h-12 rounded-full border-2 mb-2 ${isActive
+                                            ? 'bg-primary border-primary text-primary-foreground'
+                                            : isCompleted
                                                 ? 'bg-green-600 border-green-600 text-white'
                                                 : 'border-muted-foreground'
-                                        }`}>
+                                            }`}>
                                             {isCompleted ? <Check className="w-5 h-5" /> : <Icon className="w-5 h-5" />}
                                         </div>
                                         <div className="text-center">
@@ -187,9 +190,8 @@ export default function NewWorkflowPage() {
                                         </div>
                                     </div>
                                     {index < steps.length - 1 && (
-                                        <div className={`hidden sm:block w-16 h-0.5 mx-4 ${
-                                            currentStep > step.id ? 'bg-green-600' : 'bg-muted'
-                                        }`} />
+                                        <div className={`hidden sm:block w-16 h-0.5 mx-4 ${currentStep > step.id ? 'bg-green-600' : 'bg-muted'
+                                            }`} />
                                     )}
                                 </div>
                             );
@@ -212,17 +214,54 @@ export default function NewWorkflowPage() {
                                     </CardDescription>
                                 </CardHeader>
                                 <CardContent className="space-y-6">
-                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                        <div className="space-y-2">
-                                            <Label htmlFor="title">Workflow Title *</Label>
+                                    <div className="space-y-2">
+                                        <Label htmlFor="title">Workflow Title *</Label>
+                                        <Input
+                                            id="title"
+                                            name="title"
+                                            placeholder="e.g., Automated Email Marketing Campaign"
+                                            required
+                                            className="text-lg"
+                                            onChange={(e) => {
+                                                // Auto-generate slug from title if slug is empty
+                                                if (!slug) {
+                                                    const generatedSlug = generateSlugFromTitle(e.target.value);
+                                                    setSlug(generatedSlug);
+                                                }
+                                            }}
+                                        />
+                                    </div>
+
+                                    <div className="space-y-2">
+                                        <Label htmlFor="slug">URL Slug *</Label>
+                                        <div className="flex items-center space-x-2">
+                                            <span className="text-sm text-muted-foreground">wrkflow.com/workflows/</span>
                                             <Input
-                                                id="title"
-                                                name="title"
-                                                placeholder="e.g., Automated Email Marketing Campaign"
+                                                id="slug"
+                                                name="slug"
+                                                value={slug}
+                                                onChange={(e) => {
+                                                    const newSlug = e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, '');
+                                                    setSlug(newSlug);
+
+                                                    // Validate slug
+                                                    const validation = validateSlug(newSlug);
+                                                    setSlugError(validation.isValid ? '' : validation.error || '');
+                                                }}
+                                                placeholder="my-awesome-workflow"
                                                 required
-                                                className="text-lg"
+                                                className={slugError ? 'border-red-500' : ''}
                                             />
                                         </div>
+                                        {slugError && (
+                                            <p className="text-sm text-red-500">{slugError}</p>
+                                        )}
+                                        <p className="text-xs text-muted-foreground">
+                                            This will be your workflow's URL. Only lowercase letters, numbers, and hyphens allowed.
+                                        </p>
+                                    </div>
+
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                         <div className="space-y-2">
                                             <Label htmlFor="categoryId">Category</Label>
                                             <Select name="categoryId">
@@ -238,8 +277,15 @@ export default function NewWorkflowPage() {
                                                 </SelectContent>
                                             </Select>
                                         </div>
+                                        <div className="space-y-2">
+                                            <Label>Pricing</Label>
+                                            <div className="flex items-center space-x-2">
+                                                <Switch id="isPaid" name="isPaid" />
+                                                <Label htmlFor="isPaid">Paid Workflow</Label>
+                                            </div>
+                                        </div>
                                     </div>
-                                    
+
                                     <div className="space-y-2">
                                         <Label htmlFor="description">Description *</Label>
                                         <Textarea
@@ -326,9 +372,9 @@ export default function NewWorkflowPage() {
                                         />
                                         {posterImage && (
                                             <div className="max-w-md">
-                                                <NextImage 
-                                                    src={posterImage} 
-                                                    alt="Poster preview" 
+                                                <NextImage
+                                                    src={posterImage}
+                                                    alt="Poster preview"
                                                     width={400}
                                                     height={225}
                                                     className="w-full rounded-lg border"
@@ -519,9 +565,9 @@ export default function NewWorkflowPage() {
                                 <ChevronRight className="w-4 h-4 ml-2" />
                             </Button>
                         ) : (
-                            <Button 
-                                type="submit" 
-                                size="lg" 
+                            <Button
+                                type="submit"
+                                size="lg"
                                 className="w-full sm:w-auto"
                                 disabled={isSubmitting}
                             >
