@@ -3,7 +3,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { ArrowLeft, Download, Eye, Star, Share, Calendar, Copy, Edit } from "lucide-react";
+import { ArrowLeft, Eye, Calendar, Download } from "lucide-react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getDB } from "@/lib/db";
@@ -11,6 +11,9 @@ import { workflows, users } from "@/lib/db/schema";
 import { eq } from "drizzle-orm";
 import ReactMarkdown from "react-markdown";
 import { getCurrentUser } from "@/lib/auth";
+import { WorkflowActions } from "@/components/workflow-actions";
+import { WorkflowViewTracker } from "@/components/workflow-view-tracker";
+import { JsonCopyButton } from "@/components/json-copy-button";
 
 // Force dynamic rendering to ensure database access happens at request time
 export const dynamic = 'force-dynamic';
@@ -62,6 +65,7 @@ export default async function WorkflowPage({ params }: WorkflowPageProps) {
 
     return (
         <MainLayout>
+            <WorkflowViewTracker workflowId={workflowData.id} />
             <div className="container mx-auto py-8 max-w-6xl">
                 <Button variant="ghost" asChild className="mb-6">
                     <Link href="/workflows" className="flex items-center gap-2">
@@ -137,11 +141,16 @@ export default async function WorkflowPage({ params }: WorkflowPageProps) {
                                 </CardDescription>
                             </CardHeader>
                             <CardContent>
-                                <pre className="bg-muted p-4 rounded-lg overflow-x-auto text-sm">
-                                    <code>
-                                        {workflowData.jsonContent || "JSON content not available"}
-                                    </code>
-                                </pre>
+                                <div className="relative">
+                                    <pre className="bg-muted p-4 rounded-lg overflow-x-auto text-sm">
+                                        <code>
+                                            {workflowData.jsonContent || "JSON content not available"}
+                                        </code>
+                                    </pre>
+                                    {workflowData.jsonContent && (
+                                        <JsonCopyButton jsonContent={workflowData.jsonContent} />
+                                    )}
+                                </div>
                             </CardContent>
                         </Card>
                     </div>
@@ -150,43 +159,14 @@ export default async function WorkflowPage({ params }: WorkflowPageProps) {
                     <div className="space-y-6">
                         <Card>
                             <CardContent className="pt-6">
-                                <div className="space-y-4">
-                                    {workflowData.isPaid ? (
-                                        <div className="text-center">
-                                            <div className="text-3xl font-bold text-green-600 mb-2">
-                                                ${workflowData.price}
-                                            </div>
-                                            <Button className="w-full" size="lg">
-                                                Purchase Workflow
-                                            </Button>
-                                        </div>
-                                    ) : (
-                                        <Button className="w-full" size="lg">
-                                            <Download className="mr-2 h-4 w-4" />
-                                            Download Free
-                                        </Button>
-                                    )}
-
-                                    {canEdit && (
-                                        <Button variant="outline" size="sm" className="w-full" asChild>
-                                            <Link href={`/workflows/${workflowData.id}/edit`}>
-                                                <Edit className="mr-2 h-4 w-4" />
-                                                Edit Workflow
-                                            </Link>
-                                        </Button>
-                                    )}
-
-                                    <div className="flex gap-2">
-                                        <Button variant="outline" size="sm" className="flex-1">
-                                            <Star className="mr-2 h-4 w-4" />
-                                            Save
-                                        </Button>
-                                        <Button variant="outline" size="sm" className="flex-1">
-                                            <Share className="mr-2 h-4 w-4" />
-                                            Share
-                                        </Button>
-                                    </div>
-                                </div>
+                                <WorkflowActions
+                                    workflowId={workflowData.id}
+                                    isPaid={workflowData.isPaid}
+                                    price={workflowData.price}
+                                    canEdit={canEdit}
+                                    jsonContent={workflowData.jsonContent}
+                                    title={workflowData.title}
+                                />
                             </CardContent>
                         </Card>
 

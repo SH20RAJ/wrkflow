@@ -65,27 +65,28 @@ export function WorkflowActions({
 
     const handleSave = async () => {
         try {
-            // Toggle saved state
             const newSavedState = !isSaved;
+
+            // Call the API to save/unsave
+            const response = await fetch(`/api/workflows/${workflowId}/save`, {
+                method: newSavedState ? 'POST' : 'DELETE',
+            });
+
+            if (!response.ok) {
+                throw new Error('Failed to save workflow');
+            }
+
+            // Update state only after successful API call
             setIsSaved(newSavedState);
 
-            // Here you would typically call an API to save/unsave the workflow
-            // For now, we'll just show a toast
             if (newSavedState) {
                 toast.success("Workflow saved to your collection!");
             } else {
                 toast.success("Workflow removed from your collection");
             }
-
-            // TODO: Implement actual save/unsave API call
-            // await fetch(`/api/workflows/${workflowId}/save`, {
-            //     method: newSavedState ? 'POST' : 'DELETE',
-            // });
         } catch (error) {
             console.error('Save error:', error);
             toast.error("Failed to save workflow");
-            // Revert the state on error
-            setIsSaved(!isSaved);
         }
     };
 
