@@ -39,6 +39,7 @@ export default function NewWorkflowPage() {
     const [tags, setTags] = useState<string[]>([]);
     const [newTag, setNewTag] = useState('');
     const [title, setTitle] = useState('');
+    const [description, setDescription] = useState('');
     const [slug, setSlug] = useState('');
     const [slugError, setSlugError] = useState('');
 
@@ -121,6 +122,11 @@ export default function NewWorkflowPage() {
         // Validate required fields
         if (!title.trim()) {
             toast.error("Please enter a workflow title");
+            return;
+        }
+
+        if (!description.trim()) {
+            toast.error("Please enter a workflow description");
             return;
         }
 
@@ -320,6 +326,8 @@ export default function NewWorkflowPage() {
                                         <Textarea
                                             id="description"
                                             name="description"
+                                            value={description}
+                                            onChange={(e) => setDescription(e.target.value)}
                                             placeholder="Describe what your workflow does, its benefits, and use cases..."
                                             required
                                             rows={4}
