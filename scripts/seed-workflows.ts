@@ -1,6 +1,11 @@
+import dotenv from 'dotenv';
 import { getDB } from '@/lib/db';
 import { users, workflows } from '@/lib/db/schema';
 import { eq } from 'drizzle-orm';
+import { generateUniqueSlug } from '@/lib/slug-utils';
+
+// Load environment variables
+dotenv.config({ path: '.env.local' });
 
 // Sample workflow data templates
 const workflowTemplates = [
@@ -132,7 +137,7 @@ function generateWorkflowVariations() {
     const title = titles[i];
     const description = descriptions[i % descriptions.length];
     const categoryId = categories[i % categories.length];
-    
+
     variations.push({
       title,
       description,
@@ -162,7 +167,7 @@ function generateWorkflowVariations() {
 async function seedWorkflows() {
   try {
     const db = getDB();
-    
+
     // First, check if user exists
     const [existingUser] = await db
       .select()
@@ -191,28 +196,32 @@ async function seedWorkflows() {
 
     // Generate all workflow variations
     const allWorkflows = [...workflowTemplates, ...generateWorkflowVariations()];
-    
+
     // Insert workflows in batches
     const batchSize = 10;
     let insertedCount = 0;
-    
+
     for (let i = 0; i < allWorkflows.length && insertedCount < 50; i += batchSize) {
       const batch = allWorkflows.slice(i, i + batchSize).slice(0, 50 - insertedCount);
-      
-      const workflowsToInsert = batch.map(workflow => ({
-        ...workflow,
-        userId,
-        coverImage: `https://picsum.photos/800/600?random=${i + Math.random()}`,
-        posterImage: `https://picsum.photos/1200/800?random=${i + Math.random() + 1000}`,
-        youtubeUrl: Math.random() > 0.8 ? `https://youtube.com/watch?v=dQw4w9WgXcQ${i}` : null,
-        screenshots: JSON.stringify([
-          `https://picsum.photos/1024/768?random=${i + 2000}`,
-          `https://picsum.photos/1024/768?random=${i + 3000}`
-        ]),
-        demoImages: JSON.stringify([
-          `https://picsum.photos/800/600?random=${i + 4000}`,
-          `https://picsum.photos/800/600?random=${i + 5000}`
-        ])
+
+      const workflowsToInsert = await Promise.all(batch.map(async (workflow) => {
+        const slug = await generateUniqueSlug(workflow.title);
+        return {
+          ...workflow,
+          slug,
+          userId,
+          coverImage: `https://picsum.photos/800/600?random=${i + Math.random()}`,
+          posterImage: `https://picsum.photos/1200/800?random=${i + Math.random() + 1000}`,
+          youtubeUrl: Math.random() > 0.8 ? `https://youtube.com/watch?v=dQw4w9WgXcQ${i}` : null,
+          screenshots: JSON.stringify([
+            `https://picsum.photos/1024/768?random=${i + 2000}`,
+            `https://picsum.photos/1024/768?random=${i + 3000}`
+          ]),
+          demoImages: JSON.stringify([
+            `https://picsum.photos/800/600?random=${i + 4000}`,
+            `https://picsum.photos/800/600?random=${i + 5000}`
+          ])
+        };
       }));
 
       const insertedWorkflows = await db
