@@ -16,6 +16,7 @@ import { WorkflowViewTracker } from "@/components/workflow-view-tracker";
 import { JsonCopyButton } from "@/components/json-copy-button";
 import { WorkflowRatings } from "@/components/workflow-ratings";
 import { WorkflowComments } from "@/components/workflow-comments";
+import { RatingDisplay } from "@/components/rating-display";
 
 // Force dynamic rendering to ensure database access happens at request time
 export const dynamic = 'force-dynamic';
@@ -227,6 +228,24 @@ export default async function WorkflowPage({ params }: WorkflowPageProps) {
                                     <span className="text-muted-foreground">Downloads</span>
                                     <span className="font-medium">{workflowData.downloadCount}</span>
                                 </div>
+                                {workflowData.ratingStats && workflowData.ratingStats.totalRatings > 0 && (
+                                    <div className="flex justify-between items-center">
+                                        <span className="text-muted-foreground">Rating</span>
+                                        <div className="flex items-center gap-1">
+                                            <RatingDisplay
+                                                rating={workflowData.ratingStats.averageRating}
+                                                size="sm"
+                                                showValue={false}
+                                            />
+                                            <span className="font-medium text-sm">
+                                                {workflowData.ratingStats.averageRating.toFixed(1)}
+                                            </span>
+                                            <span className="text-xs text-muted-foreground">
+                                                ({workflowData.ratingStats.totalRatings})
+                                            </span>
+                                        </div>
+                                    </div>
+                                )}
                                 <div className="flex justify-between">
                                     <span className="text-muted-foreground">Created</span>
                                     <span className="font-medium">

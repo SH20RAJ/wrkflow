@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getDB } from '@/lib/db';
-import { workflows, users, tags, workflowsToTags } from '@/lib/db/schema';
-import { eq } from 'drizzle-orm';
+import { workflows, users, tags, workflowsToTags, ratings } from '@/lib/db/schema';
+import { eq, avg, count } from 'drizzle-orm';
 import { createOrGetTags, associateTagsWithWorkflow } from '@/lib/db/tags-utils';
 
 /**
@@ -67,9 +67,22 @@ export async function GET(
             .innerJoin(workflowsToTags, eq(tags.id, workflowsToTags.tagId))
             .where(eq(workflowsToTags.workflowId, id));
 
+        // Fetch rating statistics
+        const [ratingStats] = await db
+            .select({
+                averageRating: avg(ratings.rating),
+                totalRatings: count(ratings.id),
+            })
+            .from(ratings)
+            .where(eq(ratings.workflowId, id));
+
         const workflowData = {
             ...workflow[0],
-            workflowTags: workflowTags
+            workflowTags: workflowTags,
+            ratingStats: {
+                averageRating: ratingStats.averageRating ? Number(ratingStats.averageRating) : 0,
+                totalRatings: ratingStats.totalRatings || 0,
+            }
         };
 
         return NextResponse.json(workflowData);
