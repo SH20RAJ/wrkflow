@@ -12,8 +12,6 @@ export async function createOrGetTags(tagNames: string[]): Promise<string[]> {
     const tagIds: string[] = [];
 
     for (const tagName of tagNames) {
-        const slug = tagName.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
-
         // Check if tag exists
         const existingTag = await db
             .select({ id: tags.id })

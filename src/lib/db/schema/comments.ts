@@ -5,9 +5,9 @@ import { users } from './users';
 
 export const comments = sqliteTable('comments', {
     id: text('id').primaryKey().$defaultFn(() => createId()),
-    workflowId: text('workflow_id').notNull().references(() => workflows.id, { onDelete: 'cascade' }),
-    userId: text('user_id').notNull().references(() => users.id),
     content: text('content').notNull(),
+    userId: text('user_id').notNull().references(() => users.id),
+    workflowId: text('workflow_id').notNull().references(() => workflows.id, { onDelete: 'cascade' }),
     parentId: text('parent_id').references(() => comments.id),
     createdAt: integer('created_at', { mode: 'timestamp' })
         .$defaultFn(() => new Date()),
