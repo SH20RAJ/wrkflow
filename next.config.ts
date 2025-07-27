@@ -24,17 +24,13 @@ const nextConfig: NextConfig = {
   typescript: {
     ignoreBuildErrors: true,
   },
-  webpack: (config: any, { isServer }: any) => {
+  webpack: (config: Record<string, unknown>, { isServer }: { isServer: boolean }) => {
     if (isServer) {
       config.externals = config.externals || [];
-      config.externals.push('@libsql/client');
+      (config.externals as string[]).push('@libsql/client');
     }
     return config;
   },
 };
 
 export default nextConfig;
-
-// added by create cloudflare to enable calling `getCloudflareContext()` in `next dev`
-import { initOpenNextCloudflareForDev } from '@opennextjs/cloudflare';
-initOpenNextCloudflareForDev();
