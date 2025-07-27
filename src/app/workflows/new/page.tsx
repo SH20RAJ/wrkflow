@@ -42,6 +42,11 @@ export default function NewWorkflowPage() {
     const [description, setDescription] = useState('');
     const [slug, setSlug] = useState('');
     const [slugError, setSlugError] = useState('');
+    const [categoryId, setCategoryId] = useState('');
+    const [isPaid, setIsPaid] = useState(false);
+    const [isPrivate, setIsPrivate] = useState(false);
+    const [howItWorks, setHowItWorks] = useState('');
+    const [stepByStep, setStepByStep] = useState('');
 
     // New media states
     const [youtubeUrl, setYoutubeUrl] = useState('');
@@ -156,7 +161,7 @@ export default function NewWorkflowPage() {
             // Debug: Log form data
             console.log('Form data being sent:');
             for (const [key, value] of formData.entries()) {
-                console.log(`${key}: ${value}`);
+
             }
 
             const response = await fetch('/api/workflows', {
@@ -233,6 +238,19 @@ export default function NewWorkflowPage() {
                 </div>
 
                 <form onSubmit={handleSubmit} className="space-y-8">
+                    {/* Hidden inputs to ensure all data is always in the form */}
+                    <input type="hidden" name="title" value={title} />
+                    <input type="hidden" name="description" value={description} />
+                    <input type="hidden" name="slug" value={slug} />
+                    <input type="hidden" name="categoryId" value={categoryId} />
+                    <input type="hidden" name="isPaid" value={isPaid.toString()} />
+                    <input type="hidden" name="isPrivate" value={isPrivate.toString()} />
+                    <input type="hidden" name="posterImage" value={posterImage} />
+                    <input type="hidden" name="jsonContent" value={jsonInput} />
+                    <input type="hidden" name="jsonUrl" value={jsonUrl} />
+                    <input type="hidden" name="howItWorks" value={howItWorks} />
+                    <input type="hidden" name="stepByStep" value={stepByStep} />
+
                     {/* Step 1: Basic Information */}
                     {currentStep === 1 && (
                         <div className="space-y-6">
@@ -251,7 +269,6 @@ export default function NewWorkflowPage() {
                                         <Label htmlFor="title">Workflow Title *</Label>
                                         <Input
                                             id="title"
-                                            name="title"
                                             value={title}
                                             placeholder="e.g., Automated Email Marketing Campaign"
                                             required
@@ -273,7 +290,6 @@ export default function NewWorkflowPage() {
                                             <span className="text-sm text-muted-foreground">wrkflow.com/workflows/</span>
                                             <Input
                                                 id="slug"
-                                                name="slug"
                                                 value={slug}
                                                 onChange={(e) => {
                                                     const newSlug = e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, '');
@@ -299,7 +315,7 @@ export default function NewWorkflowPage() {
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                         <div className="space-y-2">
                                             <Label htmlFor="categoryId">Category</Label>
-                                            <Select name="categoryId">
+                                            <Select value={categoryId} onValueChange={setCategoryId}>
                                                 <SelectTrigger>
                                                     <SelectValue placeholder="Select a category" />
                                                 </SelectTrigger>
@@ -315,7 +331,7 @@ export default function NewWorkflowPage() {
                                         <div className="space-y-2">
                                             <Label>Pricing</Label>
                                             <div className="flex items-center space-x-2">
-                                                <Switch id="isPaid" name="isPaid" />
+                                                <Switch id="isPaid" checked={isPaid} onCheckedChange={setIsPaid} />
                                                 <Label htmlFor="isPaid">Paid Workflow</Label>
                                             </div>
                                         </div>
@@ -325,7 +341,6 @@ export default function NewWorkflowPage() {
                                         <Label htmlFor="description">Description *</Label>
                                         <Textarea
                                             id="description"
-                                            name="description"
                                             value={description}
                                             onChange={(e) => setDescription(e.target.value)}
                                             placeholder="Describe what your workflow does, its benefits, and use cases..."
@@ -367,11 +382,11 @@ export default function NewWorkflowPage() {
 
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                         <div className="flex items-center space-x-2">
-                                            <Switch id="isPaid" name="isPaid" />
+                                            <Switch id="isPaid" checked={isPaid} onCheckedChange={setIsPaid} />
                                             <Label htmlFor="isPaid">Paid Workflow</Label>
                                         </div>
                                         <div className="flex items-center space-x-2">
-                                            <Switch id="isPrivate" name="isPrivate" />
+                                            <Switch id="isPrivate" checked={isPrivate} onCheckedChange={setIsPrivate} />
                                             <Label htmlFor="isPrivate">Private Workflow</Label>
                                         </div>
                                     </div>
@@ -402,7 +417,6 @@ export default function NewWorkflowPage() {
                                         </div>
                                         <Input
                                             id="posterImage"
-                                            name="posterImage"
                                             placeholder="https://example.com/poster.jpg"
                                             value={posterImage}
                                             onChange={(e) => setPosterImage(e.target.value)}
@@ -508,7 +522,6 @@ export default function NewWorkflowPage() {
                                     {inputMethod === 'paste' ? (
                                         <div className="space-y-4">
                                             <Textarea
-                                                name="jsonContent"
                                                 placeholder="Paste your N8N workflow JSON here..."
                                                 value={jsonInput}
                                                 onChange={(e) => handleJsonInputChange(e.target.value)}
@@ -527,7 +540,6 @@ export default function NewWorkflowPage() {
                                     ) : (
                                         <div className="space-y-4">
                                             <Input
-                                                name="jsonUrl"
                                                 placeholder="https://raw.githubusercontent.com/user/repo/workflow.json"
                                                 value={jsonUrl}
                                                 onChange={(e) => setJsonUrl(e.target.value)}
@@ -560,7 +572,8 @@ export default function NewWorkflowPage() {
                                         <Label htmlFor="howItWorks">How It Works</Label>
                                         <Textarea
                                             id="howItWorks"
-                                            name="howItWorks"
+                                            value={howItWorks}
+                                            onChange={(e) => setHowItWorks(e.target.value)}
                                             placeholder="Explain the workflow logic, what it does, and how it processes data..."
                                             rows={6}
                                         />
@@ -570,7 +583,8 @@ export default function NewWorkflowPage() {
                                         <Label htmlFor="stepByStep">Step-by-Step Instructions</Label>
                                         <Textarea
                                             id="stepByStep"
-                                            name="stepByStep"
+                                            value={stepByStep}
+                                            onChange={(e) => setStepByStep(e.target.value)}
                                             placeholder="Provide detailed setup instructions, required credentials, configuration steps..."
                                             rows={8}
                                         />
