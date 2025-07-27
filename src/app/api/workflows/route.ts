@@ -156,25 +156,51 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
     try {
-        const formData = await request.formData();
-        
-        const title = formData.get("title") as string;
-        const description = formData.get("description") as string;
-        const coverImage = formData.get("coverImage") as string;
-        const posterImage = formData.get("posterImage") as string;
-        const youtubeUrl = formData.get("youtubeUrl") as string;
-        const screenshots = formData.get("screenshots") as string;
-        const demoImages = formData.get("demoImages") as string;
-        const jsonContent = formData.get("jsonContent") as string;
-        const jsonUrl = formData.get("jsonUrl") as string;
-        const isPaid = formData.get("isPaid") === "true";
-        const isPrivate = formData.get("isPrivate") === "true";
-        const price = isPaid ? parseFloat(formData.get("price") as string) || 0 : null;
-        const categoryId = formData.get("categoryId") as string;
-        const tags = formData.get("tags") as string;
-        const howItWorks = formData.get("howItWorks") as string;
-        const stepByStep = formData.get("stepByStep") as string;
-        const userId = formData.get("userId") as string;
+        const contentType = request.headers.get('content-type') || '';
+        let title, description, coverImage, posterImage, youtubeUrl, screenshots, demoImages, 
+            jsonContent, jsonUrl, isPaid, isPrivate, price, categoryId, tags, howItWorks, stepByStep, userId;
+
+        if (contentType.includes('application/json')) {
+            // Handle JSON payload
+            const body = await request.json();
+            title = body.title;
+            description = body.description;
+            coverImage = body.coverImage;
+            posterImage = body.posterImage;
+            youtubeUrl = body.youtubeUrl;
+            screenshots = body.screenshots;
+            demoImages = body.demoImages;
+            jsonContent = body.jsonContent;
+            jsonUrl = body.jsonUrl;
+            isPaid = body.isPaid === true || body.isPaid === "true";
+            isPrivate = body.isPrivate === true || body.isPrivate === "true";
+            price = isPaid ? parseFloat(body.price) || 0 : null;
+            categoryId = body.categoryId;
+            tags = body.tags;
+            howItWorks = body.howItWorks;
+            stepByStep = body.stepByStep;
+            userId = body.userId;
+        } else {
+            // Handle FormData payload
+            const formData = await request.formData();
+            title = formData.get("title") as string;
+            description = formData.get("description") as string;
+            coverImage = formData.get("coverImage") as string;
+            posterImage = formData.get("posterImage") as string;
+            youtubeUrl = formData.get("youtubeUrl") as string;
+            screenshots = formData.get("screenshots") as string;
+            demoImages = formData.get("demoImages") as string;
+            jsonContent = formData.get("jsonContent") as string;
+            jsonUrl = formData.get("jsonUrl") as string;
+            isPaid = formData.get("isPaid") === "true";
+            isPrivate = formData.get("isPrivate") === "true";
+            price = isPaid ? parseFloat(formData.get("price") as string) || 0 : null;
+            categoryId = formData.get("categoryId") as string;
+            tags = formData.get("tags") as string;
+            howItWorks = formData.get("howItWorks") as string;
+            stepByStep = formData.get("stepByStep") as string;
+            userId = formData.get("userId") as string;
+        }
 
         // Validation
         if (!title?.trim()) {
