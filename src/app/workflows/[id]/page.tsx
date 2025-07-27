@@ -18,6 +18,12 @@ import { JsonCopyButton } from "@/components/json-copy-button";
 // Force dynamic rendering to ensure database access happens at request time
 export const dynamic = 'force-dynamic';
 
+interface WorkflowTag {
+    id: string;
+    name: string;
+    slug: string;
+}
+
 interface WorkflowPageProps {
     params: Promise<{
         id: string;
@@ -91,6 +97,18 @@ export default async function WorkflowPage({ params }: WorkflowPageProps) {
                             <div className="text-lg text-muted-foreground mb-4 prose prose-lg max-w-none">
                                 <ReactMarkdown>{workflowData.description}</ReactMarkdown>
                             </div>
+
+                            {/* Tags */}
+                            {workflowData.workflowTags && workflowData.workflowTags.length > 0 && (
+                                <div className="flex flex-wrap gap-2 mb-4">
+                                    {workflowData.workflowTags.map((tag) => (
+                                        <Badge key={tag.id} variant="secondary">
+                                            {tag.name}
+                                        </Badge>
+                                    ))}
+                                </div>
+                            )}
+
                             <div className="flex items-center gap-4 text-sm text-muted-foreground">
                                 <span className="flex items-center gap-1">
                                     <Eye className="h-4 w-4" />

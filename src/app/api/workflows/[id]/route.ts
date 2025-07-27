@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getDB } from '@/lib/db';
-import { workflows, users } from '@/lib/db/schema';
+import { workflows, users, tags, workflowsToTags } from '@/lib/db/schema';
 import { eq } from 'drizzle-orm';
+import { createOrGetTags, associateTagsWithWorkflow } from '@/lib/db/tags-utils';
 
 /**
  * GET /api/workflows/[id]
@@ -55,7 +56,23 @@ export async function GET(
             );
         }
 
-        return NextResponse.json(workflow[0]);
+        // Fetch tags for this workflow
+        const workflowTags = await db
+            .select({
+                id: tags.id,
+                name: tags.name,
+                slug: tags.slug,
+            })
+            .from(tags)
+            .innerJoin(workflowsToTags, eq(tags.id, workflowsToTags.tagId))
+            .where(eq(workflowsToTags.workflowId, id));
+
+        const workflowData = {
+            ...workflow[0],
+            workflowTags: workflowTags
+        };
+
+        return NextResponse.json(workflowData);
     } catch (error) {
         console.error(`Error fetching workflow:`, error);
         return NextResponse.json(
@@ -139,6 +156,10 @@ export async function PUT(
             );
         }
 
+        // Handle tags separately
+        const tagsData = cleanedData.tags;
+        delete cleanedData.tags; // Remove from main update data
+
         // Add updatedAt timestamp
         cleanedData.updatedAt = new Date();
 
@@ -148,6 +169,20 @@ export async function PUT(
             .set(cleanedData)
             .where(eq(workflows.id, id))
             .returning();
+
+        // Handle tags if provided
+        if (tagsData) {
+            try {
+                const parsedTags = JSON.parse(tagsData as string);
+                if (Array.isArray(parsedTags)) {
+                    const tagIds = await createOrGetTags(parsedTags);
+                    await associateTagsWithWorkflow(id, tagIds);
+                }
+            } catch (error) {
+                console.error('Error processing tags:', error);
+                // Don't fail the workflow update if tags fail
+            }
+        }
 
         return NextResponse.json({
             success: true,

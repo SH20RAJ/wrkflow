@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getDB } from '@/lib/db';
 import { workflows, users } from '@/lib/db/schema';
 import { eq, like, and, or, desc, asc, count } from 'drizzle-orm';
+import { createOrGetTags, associateTagsWithWorkflow } from '@/lib/db/tags-utils';
 
 export async function GET(request: NextRequest) {
     try {
@@ -31,7 +32,7 @@ export async function GET(request: NextRequest) {
 
         // Build where conditions
         const conditions = [];
-        
+
         if (search) {
             conditions.push(
                 or(
@@ -157,7 +158,7 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
     try {
         const contentType = request.headers.get('content-type') || '';
-        let title, description, coverImage, posterImage, youtubeUrl, screenshots, demoImages, 
+        let title, description, coverImage, posterImage, youtubeUrl, screenshots, demoImages,
             jsonContent, jsonUrl, isPaid, isPrivate, price, categoryId, tags, howItWorks, stepByStep, userId;
 
         if (contentType.includes('application/json')) {
@@ -267,6 +268,20 @@ export async function POST(request: NextRequest) {
                 stepByStep: stepByStep?.trim() || null,
             })
             .returning();
+
+        // Handle tags if provided
+        if (tags) {
+            try {
+                const parsedTags = JSON.parse(tags);
+                if (Array.isArray(parsedTags) && parsedTags.length > 0) {
+                    const tagIds = await createOrGetTags(parsedTags);
+                    await associateTagsWithWorkflow(newWorkflow.id, tagIds);
+                }
+            } catch (error) {
+                console.error('Error processing tags:', error);
+                // Don't fail the workflow creation if tags fail
+            }
+        }
 
         return NextResponse.json({
             success: true,
