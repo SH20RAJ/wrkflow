@@ -2,8 +2,6 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getDB } from '@/lib/db';
 import { workflows, users } from '@/lib/db/schema';
 import { eq, like, and, or, desc, asc, count } from 'drizzle-orm';
-import { createOrGetTags, associateTagsWithWorkflow } from '@/lib/db/tags-utils';
-import { generateUniqueSlug, validateSlug, isSlugAvailable } from '@/lib/slug-utils';
 
 export async function GET(request: NextRequest) {
     try {
@@ -33,7 +31,7 @@ export async function GET(request: NextRequest) {
 
         // Build where conditions
         const conditions = [];
-
+        
         if (search) {
             conditions.push(
                 or(
@@ -159,14 +157,13 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
     try {
         const contentType = request.headers.get('content-type') || '';
-        let title, slug, description, coverImage, posterImage, youtubeUrl, screenshots, demoImages,
+        let title, description, coverImage, posterImage, youtubeUrl, screenshots, demoImages, 
             jsonContent, jsonUrl, isPaid, isPrivate, price, categoryId, tags, howItWorks, stepByStep, userId;
 
         if (contentType.includes('application/json')) {
             // Handle JSON payload
             const body = await request.json();
             title = body.title;
-            slug = body.slug;
             description = body.description;
             coverImage = body.coverImage;
             posterImage = body.posterImage;
@@ -187,7 +184,6 @@ export async function POST(request: NextRequest) {
             // Handle FormData payload
             const formData = await request.formData();
             title = formData.get("title") as string;
-            slug = formData.get("slug") as string;
             description = formData.get("description") as string;
             coverImage = formData.get("coverImage") as string;
             posterImage = formData.get("posterImage") as string;
@@ -248,40 +244,11 @@ export async function POST(request: NextRequest) {
             }
         }
 
-        // Handle slug generation and validation
-        let finalSlug: string;
-        if (slug?.trim()) {
-            // User provided a custom slug, validate it
-            const slugValidation = validateSlug(slug.trim());
-            if (!slugValidation.isValid) {
-                return NextResponse.json(
-                    { success: false, error: slugValidation.error },
-                    { status: 400 }
-                );
-            }
-
-            // Check if slug is available
-            const db = getDB();
-            const isAvailable = await isSlugAvailable(slug.trim());
-            if (!isAvailable) {
-                return NextResponse.json(
-                    { success: false, error: "This slug is already taken. Please choose a different one." },
-                    { status: 400 }
-                );
-            }
-
-            finalSlug = slug.trim();
-        } else {
-            // Generate a unique slug from title
-            finalSlug = await generateUniqueSlug(title);
-        }
-
         const db = getDB();
         const [newWorkflow] = await db
             .insert(workflows)
             .values({
                 title: title.trim(),
-                slug: finalSlug,
                 description: description.trim(),
                 coverImage: coverImage?.trim() || null,
                 posterImage: posterImage?.trim() || null,
@@ -301,26 +268,9 @@ export async function POST(request: NextRequest) {
             })
             .returning();
 
-        // Handle tags if provided
-        if (tags) {
-            try {
-                const parsedTags = JSON.parse(tags);
-                if (Array.isArray(parsedTags) && parsedTags.length > 0) {
-                    const tagIds = await createOrGetTags(parsedTags);
-                    await associateTagsWithWorkflow(newWorkflow.id, tagIds);
-                }
-            } catch (error) {
-                console.error('Error processing tags:', error);
-                // Don't fail the workflow creation if tags fail
-            }
-        }
-
         return NextResponse.json({
             success: true,
-            workflow: {
-                ...newWorkflow,
-                slug: finalSlug
-            },
+            workflow: newWorkflow,
             message: "Workflow created successfully"
         });
     } catch (error) {

@@ -1,353 +1,311 @@
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { MainLayout } from "@/components/layout/main-layout";
-import { APP_NAME, APP_DESCRIPTION } from "@/lib/constants";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { 
-  Zap, 
-  Users, 
-  DollarSign, 
-  TrendingUp, 
-  Shield, 
-  Rocket,
-  Star,
-  CheckCircle,
+  Search, 
+  Workflow,
   ArrowRight,
   Play,
   Download,
-  Eye,
-  Code,
+  Star,
+  Zap,
+  Users,
   Globe,
-  Workflow
+  Sparkles,
+  ChevronRight
 } from "lucide-react";
+
+// Mock data for featured workflows
+const featuredWorkflows = [
+  {
+    id: "1",
+    title: "E-commerce Order Automation",
+    description: "Streamline order processing with automated inventory updates and customer notifications",
+    author: "Sarah Chen",
+    avatar: "https://i.pravatar.cc/40?img=1",
+    downloads: 2847,
+    rating: 4.9,
+    price: null,
+    tags: ["e-commerce", "automation", "notifications"]
+  },
+  {
+    id: "2", 
+    title: "Social Media Content Pipeline",
+    description: "Auto-schedule and cross-post content across multiple social platforms",
+    author: "Alex Morgan",
+    avatar: "https://i.pravatar.cc/40?img=2",
+    downloads: 1923,
+    rating: 4.8,
+    price: 29,
+    tags: ["social-media", "content", "scheduling"]
+  },
+  {
+    id: "3",
+    title: "Customer Support Ticket Router",
+    description: "Intelligently route support tickets based on keywords and urgency",
+    author: "David Kim",
+    avatar: "https://i.pravatar.cc/40?img=3", 
+    downloads: 1456,
+    rating: 4.7,
+    price: null,
+    tags: ["support", "automation", "routing"]
+  }
+];
+
+const categories = [
+  { name: "E-commerce", icon: "🛒", count: 127 },
+  { name: "Marketing", icon: "📈", count: 89 },
+  { name: "Support", icon: "🎧", count: 67 },
+  { name: "Analytics", icon: "📊", count: 54 },
+  { name: "Social Media", icon: "📱", count: 43 },
+  { name: "Finance", icon: "💰", count: 38 }
+];
 
 export default function Home() {
   return (
     <MainLayout>
       {/* Hero Section */}
-      <section className="relative overflow-hidden bg-gradient-to-br from-background via-background to-muted/20">
-        <div className="absolute inset-0 bg-grid-white/[0.02] bg-[size:50px_50px]" />
-        <div className="relative container mx-auto px-4 py-16 sm:py-24 lg:py-32">
+      <section className="relative">
+        <div className="container mx-auto px-4 py-12 lg:py-20">
           <div className="mx-auto max-w-4xl text-center">
-            <Badge variant="secondary" className="mb-6 px-4 py-2 text-sm font-medium">
-              <Rocket className="mr-2 h-4 w-4" />
-              The Ultimate N8N Workflow Marketplace
+            <Badge variant="outline" className="mb-6 border-primary/20 bg-primary/5 px-4 py-2 text-primary">
+              <Sparkles className="mr-2 h-4 w-4" />
+              Trusted by 10,000+ automation experts
             </Badge>
             
-            <h1 className="mb-6 text-4xl font-bold tracking-tight sm:text-6xl lg:text-7xl">
-              Build, Share & 
-              <span className="bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-600 bg-clip-text text-transparent">
-                {" "}Monetize
-              </span>
+            <h1 className="mb-6 text-4xl font-bold tracking-tight lg:text-6xl">
+              Discover workflows that
               <br />
-              N8N Workflows
+              <span className="bg-gradient-to-r from-primary via-primary/80 to-primary/60 bg-clip-text text-transparent">
+                transform your business
+              </span>
             </h1>
             
-            <p className="mx-auto mb-8 max-w-2xl text-lg leading-8 text-muted-foreground sm:text-xl">
-              Join the largest community of N8N automation experts. Discover powerful workflows, 
-              share your creations, and earn from your automation expertise.
+            <p className="mx-auto mb-10 max-w-2xl text-lg text-muted-foreground lg:text-xl">
+              Browse, download, and deploy production-ready N8N workflows. 
+              From simple automations to complex integrations.
             </p>
-            
-            <div className="flex flex-col gap-4 sm:flex-row sm:justify-center">
-              <Button size="lg" className="h-14 px-8 text-lg" asChild>
-                <Link href="/workflows" className="flex items-center gap-2">
-                  <Play className="h-5 w-5" />
-                  Explore Workflows
-                </Link>
-              </Button>
-              <Button variant="outline" size="lg" className="h-14 px-8 text-lg" asChild>
-                <Link href="/handler/sign-up" className="flex items-center gap-2">
-                  <Rocket className="h-5 w-5" />
-                  Start Creating
-                </Link>
-              </Button>
+
+            {/* Search Bar */}
+            <div className="mx-auto mb-12 max-w-2xl">
+              <div className="relative">
+                <Search className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-muted-foreground" />
+                <Input
+                  placeholder="Search workflows, creators, or tags..."
+                  className="h-14 pl-12 pr-32 text-lg"
+                />
+                <Button 
+                  size="sm" 
+                  className="absolute right-2 top-1/2 h-10 -translate-y-1/2"
+                >
+                  Search
+                </Button>
+              </div>
             </div>
-            
-            {/* Stats */}
-            <div className="mt-16 grid grid-cols-2 gap-8 sm:grid-cols-4">
+
+            {/* Quick Stats */}
+            <div className="grid grid-cols-3 gap-8 lg:gap-12">
               <div className="text-center">
-                <div className="text-3xl font-bold text-primary">1000+</div>
-                <div className="text-sm text-muted-foreground">Workflows</div>
+                <div className="text-3xl font-bold lg:text-4xl">1,247</div>
+                <div className="text-sm text-muted-foreground lg:text-base">Workflows</div>
               </div>
               <div className="text-center">
-                <div className="text-3xl font-bold text-primary">500+</div>
-                <div className="text-sm text-muted-foreground">Creators</div>
+                <div className="text-3xl font-bold lg:text-4xl">47K+</div>
+                <div className="text-sm text-muted-foreground lg:text-base">Downloads</div>
               </div>
               <div className="text-center">
-                <div className="text-3xl font-bold text-primary">50K+</div>
-                <div className="text-sm text-muted-foreground">Downloads</div>
-              </div>
-              <div className="text-center">
-                <div className="text-3xl font-bold text-primary">99%</div>
-                <div className="text-sm text-muted-foreground">Satisfaction</div>
+                <div className="text-3xl font-bold lg:text-4xl">324</div>
+                <div className="text-sm text-muted-foreground lg:text-base">Creators</div>
               </div>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Features Section */}
-      <section className="py-16 sm:py-24">
+      {/* Categories Section */}
+      <section className="bg-muted/30 py-12">
         <div className="container mx-auto px-4">
-          <div className="mx-auto max-w-2xl text-center mb-16">
-            <h2 className="text-3xl font-bold tracking-tight sm:text-4xl mb-4">
-              Why Choose Our Platform?
-            </h2>
-            <p className="text-lg text-muted-foreground">
-              Everything you need to succeed in the N8N automation ecosystem
-            </p>
+          <div className="mb-8 flex items-center justify-between">
+            <h2 className="text-2xl font-semibold">Browse by Category</h2>
+            <Button variant="ghost" size="sm" asChild>
+              <Link href="/categories" className="group">
+                View all
+                <ChevronRight className="ml-1 h-4 w-4 transition-transform group-hover:translate-x-1" />
+              </Link>
+            </Button>
           </div>
 
-          <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
-            <Card className="relative overflow-hidden border-0 bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-950/20 dark:to-indigo-950/20">
-              <CardHeader>
-                <div className="flex items-center gap-3">
-                  <div className="rounded-lg bg-blue-600 p-2">
-                    <Workflow className="h-6 w-6 text-white" />
-                  </div>
-                  <CardTitle>Rich Workflow Library</CardTitle>
-                </div>
-              </CardHeader>
-              <CardContent>
-                <p className="text-muted-foreground">
-                  Access thousands of pre-built N8N workflows across all industries and use cases.
-                </p>
-              </CardContent>
-            </Card>
-
-            <Card className="relative overflow-hidden border-0 bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-950/20 dark:to-emerald-950/20">
-              <CardHeader>
-                <div className="flex items-center gap-3">
-                  <div className="rounded-lg bg-green-600 p-2">
-                    <DollarSign className="h-6 w-6 text-white" />
-                  </div>
-                  <CardTitle>Monetize Your Skills</CardTitle>
-                </div>
-              </CardHeader>
-              <CardContent>
-                <p className="text-muted-foreground">
-                  Sell your workflows and earn passive income from your automation expertise.
-                </p>
-              </CardContent>
-            </Card>
-
-            <Card className="relative overflow-hidden border-0 bg-gradient-to-br from-purple-50 to-violet-50 dark:from-purple-950/20 dark:to-violet-950/20">
-              <CardHeader>
-                <div className="flex items-center gap-3">
-                  <div className="rounded-lg bg-purple-600 p-2">
-                    <Users className="h-6 w-6 text-white" />
-                  </div>
-                  <CardTitle>Active Community</CardTitle>
-                </div>
-              </CardHeader>
-              <CardContent>
-                <p className="text-muted-foreground">
-                  Connect with fellow automation enthusiasts and learn from the best.
-                </p>
-              </CardContent>
-            </Card>
-
-            <Card className="relative overflow-hidden border-0 bg-gradient-to-br from-orange-50 to-red-50 dark:from-orange-950/20 dark:to-red-950/20">
-              <CardHeader>
-                <div className="flex items-center gap-3">
-                  <div className="rounded-lg bg-orange-600 p-2">
-                    <Shield className="h-6 w-6 text-white" />
-                  </div>
-                  <CardTitle>Secure & Reliable</CardTitle>
-                </div>
-              </CardHeader>
-              <CardContent>
-                <p className="text-muted-foreground">
-                  Enterprise-grade security with reliable hosting and 99.9% uptime guarantee.
-                </p>
-              </CardContent>
-            </Card>
-
-            <Card className="relative overflow-hidden border-0 bg-gradient-to-br from-teal-50 to-cyan-50 dark:from-teal-950/20 dark:to-cyan-950/20">
-              <CardHeader>
-                <div className="flex items-center gap-3">
-                  <div className="rounded-lg bg-teal-600 p-2">
-                    <TrendingUp className="h-6 w-6 text-white" />
-                  </div>
-                  <CardTitle>Analytics & Insights</CardTitle>
-                </div>
-              </CardHeader>
-              <CardContent>
-                <p className="text-muted-foreground">
-                  Track performance, downloads, and earnings with detailed analytics.
-                </p>
-              </CardContent>
-            </Card>
-
-            <Card className="relative overflow-hidden border-0 bg-gradient-to-br from-pink-50 to-rose-50 dark:from-pink-950/20 dark:to-rose-950/20">
-              <CardHeader>
-                <div className="flex items-center gap-3">
-                  <div className="rounded-lg bg-pink-600 p-2">
-                    <Zap className="h-6 w-6 text-white" />
-                  </div>
-                  <CardTitle>Easy Integration</CardTitle>
-                </div>
-              </CardHeader>
-              <CardContent>
-                <p className="text-muted-foreground">
-                  One-click import to your N8N instance with detailed setup instructions.
-                </p>
-              </CardContent>
-            </Card>
+          <div className="grid grid-cols-2 gap-4 lg:grid-cols-6">
+            {categories.map((category) => (
+              <Card 
+                key={category.name}
+                className="group cursor-pointer border-0 bg-background/60 backdrop-blur-sm transition-all hover:bg-background hover:shadow-md"
+              >
+                <CardContent className="p-6 text-center">
+                  <div className="mb-3 text-3xl">{category.icon}</div>
+                  <div className="font-medium">{category.name}</div>
+                  <div className="text-sm text-muted-foreground">{category.count} workflows</div>
+                </CardContent>
+              </Card>
+            ))}
           </div>
         </div>
       </section>
 
-      {/* How It Works Section */}
-      <section className="py-16 sm:py-24 bg-muted/30">
+      {/* Featured Workflows */}
+      <section className="py-12 lg:py-16">
         <div className="container mx-auto px-4">
-          <div className="mx-auto max-w-2xl text-center mb-16">
-            <h2 className="text-3xl font-bold tracking-tight sm:text-4xl mb-4">
-              How It Works
-            </h2>
-            <p className="text-lg text-muted-foreground">
-              Get started in minutes with our simple process
-            </p>
+          <div className="mb-8 flex items-center justify-between">
+            <div>
+              <h2 className="text-2xl font-semibold lg:text-3xl">Featured Workflows</h2>
+              <p className="text-muted-foreground">Handpicked by our community</p>
+            </div>
+            <Button variant="outline" asChild>
+              <Link href="/workflows" className="group">
+                Explore all
+                <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
+              </Link>
+            </Button>
           </div>
 
-          <div className="grid gap-8 md:grid-cols-3">
-            <div className="text-center">
-              <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-full bg-primary text-primary-foreground">
-                <span className="text-2xl font-bold">1</span>
-              </div>
-              <h3 className="mb-4 text-xl font-semibold">Browse & Discover</h3>
-              <p className="text-muted-foreground">
-                Explore our extensive library of N8N workflows across different categories and use cases.
-              </p>
-            </div>
+          <div className="grid gap-6 lg:grid-cols-3">
+            {featuredWorkflows.map((workflow) => (
+              <Card 
+                key={workflow.id}
+                className="group cursor-pointer border-0 bg-gradient-to-br from-background to-muted/20 transition-all hover:shadow-lg hover:shadow-primary/5"
+              >
+                <CardHeader className="pb-4">
+                  <div className="flex items-start justify-between">
+                    <div className="flex-1">
+                      <CardTitle className="text-lg leading-tight group-hover:text-primary transition-colors">
+                        {workflow.title}
+                      </CardTitle>
+                      <p className="mt-2 text-sm text-muted-foreground line-clamp-2">
+                        {workflow.description}
+                      </p>
+                    </div>
+                    {workflow.price ? (
+                      <Badge variant="secondary" className="ml-2">
+                        ${workflow.price}
+                      </Badge>
+                    ) : (
+                      <Badge variant="outline" className="ml-2">
+                        Free
+                      </Badge>
+                    )}
+                  </div>
+                </CardHeader>
 
-            <div className="text-center">
-              <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-full bg-primary text-primary-foreground">
-                <span className="text-2xl font-bold">2</span>
-              </div>
-              <h3 className="mb-4 text-xl font-semibold">Download & Import</h3>
-              <p className="text-muted-foreground">
-                One-click download with detailed setup instructions and video tutorials.
-              </p>
-            </div>
+                <CardContent className="pt-0">
+                  <div className="mb-4 flex flex-wrap gap-1">
+                    {workflow.tags.slice(0, 3).map((tag) => (
+                      <Badge key={tag} variant="secondary" className="text-xs">
+                        {tag}
+                      </Badge>
+                    ))}
+                  </div>
 
-            <div className="text-center">
-              <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-full bg-primary text-primary-foreground">
-                <span className="text-2xl font-bold">3</span>
-              </div>
-              <h3 className="mb-4 text-xl font-semibold">Customize & Deploy</h3>
-              <p className="text-muted-foreground">
-                Adapt the workflow to your needs and deploy it in your N8N environment.
-              </p>
-            </div>
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <Avatar className="h-8 w-8">
+                        <AvatarImage src={workflow.avatar} />
+                        <AvatarFallback>{workflow.author[0]}</AvatarFallback>
+                      </Avatar>
+                      <div className="text-sm">
+                        <div className="font-medium">{workflow.author}</div>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center gap-4 text-sm text-muted-foreground">
+                      <div className="flex items-center gap-1">
+                        <Star className="h-4 w-4 fill-current text-yellow-500" />
+                        {workflow.rating}
+                      </div>
+                      <div className="flex items-center gap-1">
+                        <Download className="h-4 w-4" />
+                        {workflow.downloads.toLocaleString()}
+                      </div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
           </div>
         </div>
       </section>
 
-      {/* Testimonials Section */}
-      <section className="py-16 sm:py-24">
+      {/* Why Choose Us */}
+      <section className="bg-muted/30 py-12 lg:py-16">
         <div className="container mx-auto px-4">
-          <div className="mx-auto max-w-2xl text-center mb-16">
-            <h2 className="text-3xl font-bold tracking-tight sm:text-4xl mb-4">
-              What Our Users Say
+          <div className="mx-auto max-w-3xl text-center">
+            <h2 className="mb-4 text-2xl font-semibold lg:text-3xl">
+              Why developers choose Wrkflow
             </h2>
-            <p className="text-lg text-muted-foreground">
-              Join thousands of satisfied automation experts
+            <p className="mb-12 text-lg text-muted-foreground">
+              Join the fastest-growing N8N community and accelerate your automation journey
             </p>
-          </div>
 
-          <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
-            <Card>
-              <CardHeader>
-                <div className="flex items-center gap-3">
-                  <div className="h-10 w-10 rounded-full bg-gradient-to-r from-blue-600 to-purple-600" />
-                  <div>
-                    <div className="font-semibold">Sarah Chen</div>
-                    <div className="text-sm text-muted-foreground">Automation Consultant</div>
-                  </div>
+            <div className="grid gap-8 lg:grid-cols-3">
+              <div className="text-center">
+                <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-primary/10">
+                  <Zap className="h-8 w-8 text-primary" />
                 </div>
-              </CardHeader>
-              <CardContent>
-                <div className="flex mb-3">
-                  {[...Array(5)].map((_, i) => (
-                    <Star key={i} className="h-4 w-4 fill-yellow-400 text-yellow-400" />
-                  ))}
-                </div>
-                <p className="text-muted-foreground">
-                  "This platform has revolutionized how I share my N8N workflows. The monetization features are fantastic!"
+                <h3 className="mb-2 font-semibold">Production Ready</h3>
+                <p className="text-sm text-muted-foreground">
+                  Battle-tested workflows used by thousands of businesses worldwide
                 </p>
-              </CardContent>
-            </Card>
+              </div>
 
-            <Card>
-              <CardHeader>
-                <div className="flex items-center gap-3">
-                  <div className="h-10 w-10 rounded-full bg-gradient-to-r from-green-600 to-teal-600" />
-                  <div>
-                    <div className="font-semibold">Marcus Rodriguez</div>
-                    <div className="text-sm text-muted-foreground">DevOps Engineer</div>
-                  </div>
+              <div className="text-center">
+                <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-primary/10">
+                  <Users className="h-8 w-8 text-primary" />
                 </div>
-              </CardHeader>
-              <CardContent>
-                <div className="flex mb-3">
-                  {[...Array(5)].map((_, i) => (
-                    <Star key={i} className="h-4 w-4 fill-yellow-400 text-yellow-400" />
-                  ))}
-                </div>
-                <p className="text-muted-foreground">
-                  "Found exactly what I needed for our CI/CD pipeline. The quality of workflows here is outstanding."
+                <h3 className="mb-2 font-semibold">Expert Community</h3>
+                <p className="text-sm text-muted-foreground">
+                  Learn from automation experts and get help when you need it
                 </p>
-              </CardContent>
-            </Card>
+              </div>
 
-            <Card>
-              <CardHeader>
-                <div className="flex items-center gap-3">
-                  <div className="h-10 w-10 rounded-full bg-gradient-to-r from-purple-600 to-pink-600" />
-                  <div>
-                    <div className="font-semibold">Emily Johnson</div>
-                    <div className="text-sm text-muted-foreground">Marketing Director</div>
-                  </div>
+              <div className="text-center">
+                <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-primary/10">
+                  <Globe className="h-8 w-8 text-primary" />
                 </div>
-              </CardHeader>
-              <CardContent>
-                <div className="flex mb-3">
-                  {[...Array(5)].map((_, i) => (
-                    <Star key={i} className="h-4 w-4 fill-yellow-400 text-yellow-400" />
-                  ))}
-                </div>
-                <p className="text-muted-foreground">
-                  "The marketing automation workflows saved us hundreds of hours. Highly recommend this platform!"
+                <h3 className="mb-2 font-semibold">Always Updated</h3>
+                <p className="text-sm text-muted-foreground">
+                  Workflows are constantly updated to work with the latest APIs
                 </p>
-              </CardContent>
-            </Card>
+              </div>
+            </div>
           </div>
         </div>
       </section>
 
       {/* CTA Section */}
-      <section className="py-16 sm:py-24 bg-gradient-to-r from-blue-600 to-purple-600">
-        <div className="container mx-auto px-4 text-center">
-          <div className="mx-auto max-w-2xl">
-            <h2 className="text-3xl font-bold tracking-tight text-white sm:text-4xl mb-4">
-              Ready to Transform Your Automation Game?
+      <section className="py-12 lg:py-16">
+        <div className="container mx-auto px-4">
+          <div className="mx-auto max-w-2xl text-center">
+            <h2 className="mb-4 text-2xl font-semibold lg:text-3xl">
+              Ready to automate your workflow?
             </h2>
-            <p className="text-lg text-blue-100 mb-8">
-              Join thousands of creators and start monetizing your N8N expertise today.
+            <p className="mb-8 text-lg text-muted-foreground">
+              Start building powerful automations today. Join thousands of developers who trust Wrkflow.
             </p>
+
             <div className="flex flex-col gap-4 sm:flex-row sm:justify-center">
-              <Button size="lg" variant="secondary" className="h-14 px-8 text-lg" asChild>
-                <Link href="/handler/sign-up" className="flex items-center gap-2">
-                  <CheckCircle className="h-5 w-5" />
-                  Get Started Free
+              <Button size="lg" className="h-12 px-8" asChild>
+                <Link href="/workflows">
+                  <Play className="mr-2 h-5 w-5" />
+                  Browse Workflows
                 </Link>
               </Button>
-              <Button size="lg" variant="outline" className="h-14 px-8 text-lg border-white text-white hover:bg-white hover:text-primary" asChild>
-                <Link href="/workflows" className="flex items-center gap-2">
-                  <Eye className="h-5 w-5" />
-                  Browse Workflows
+              <Button variant="outline" size="lg" className="h-12 px-8" asChild>
+                <Link href="/auth/signup">
+                  <Workflow className="mr-2 h-5 w-5" />
+                  Start Creating
                 </Link>
               </Button>
             </div>
